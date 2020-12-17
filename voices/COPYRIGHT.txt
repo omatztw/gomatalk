@@ -1,0 +1,101 @@
+----------------------------------------------------------------------------------
+HTS voice tohoku-f01-{angry,happy,neutral,sad}                                   
+Copyright(c) 2015 Intelligent Communication Network (Ito-Nose) Laboratory
+                  Tohoku University.
+
+tohoku-f01 is released by Intelligent Communication Network Laboratory, Tohoku University.
+Some rights reserved.                                                         
+
+This work is licensed under the Creative Commons Attribution 4.0 license (CC-BY 4.0).
+----------------------------------------------------------------------------------
+This is a human-readable summary of (and not a substitute for) the license.
+
+You are free to:
+
+Share ? copy and redistribute the material in any medium or format
+Adapt ? remix, transform, and build upon the material
+for any purpose, even commercially.
+The licensor cannot revoke these freedoms as long as you follow the license terms.
+
+
+Under the following terms:
+
+Attribution ? You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+No additional restrictions ? You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+
+Notices:
+
+You do not have to comply with the license for elements of the material in the public domain or where your use is permitted by an applicable exception or limitation.
+No warranties are given. The license may not give you all of the permissions necessary for your intended use. For example, other rights such as publicity, privacy, or moral rights may limit how you use the material.
+
+
+---------------------------------------------------------------
+
+音響モデルの利用規約
+発行日　2013年11月16日
+発行者　アキヒロ
+バージョン　1.1
+
+■本利用規約について■
+本利用規約は、同梱されている音響モデルの使用について定めるものです。 
+
+■利用規約■
+
+利用規約に同意していただくことにより、本音響モデルの使用を許諾します。
+同意していただけない場合、本音響モデルの使用はできません。法人・個人を問わず、非商用の活動の範囲内（営利を目的としない同人活動を含む）であれば、どなたでも無料で使用することができます。 
+本音響モデルを使用し制作された作品の発表に際し、著作権者および配布者への事前事後の連絡は不要です。
+
+※DL販売は、営利を目的としない同人活動の範囲には含まれません。別途利用規約が必要となります。
+
+■追加利用規約■
+/**/
+
+■別途使用許諾が必要な場合■
+本音響モデルの商用での利用、上記の利用規約の範囲を超える音響モデルの利用については、事前に別途の利用規約が必要となります。 
+そのような本音響モデルの使用については下記の連絡先にお問い合わせください。
+
+■禁止事項■
+本音響モデルの使用にあたり、以下の行為は禁止されています。
+・犯罪系、自殺系など倫理的・法律的に問題のあるサイト、作品での本音響モデルのご利用。それ以外にも著作権者が不適当と判断した場合には、ご利用を中止するよう要請する場合があります。
+・本音響モデルを用いての宗教勧誘活動。
+・本音響モデルを用いての特定の人物・政党・その他団体による政治的活動。
+・本音響モデルを用いて特定の人物・地域・民族・企業・球団・政党・軍隊・国家・その他団体を攻撃する行為。
+・本音響モデルを用いての犯罪等の反社会的活動。
+・本音響モデルを用いて、第三者の権利を侵害する行為。
+・本音響モデルを用いて、公序良俗に著しく反する行為。
+・本音響モデルの著作情報を偽ること。
+・本音響モデルを改変の有無を問わず、著作者の承諾を得ずにその全部または一部を販売、配布すること。
+・本利用規約に反すること。
+
+■禁止事項の非適用■
+以下の行為は禁止事項にあたりません。
+・個人利用の範囲内での本音響モデルを用いた作品の発表。
+
+■準拠法■
+本利用規約は日本法に準拠し、日本法によって解釈されるものとします。本利用規約に強行法規と抵触する規定がある場合には、当該規定は当該部分に限って無効となり、当該規定は強行法規に合致する
+範囲内で当該規定に最も近い内容に修正されるものとします。
+
+■管轄■
+本契約に関して裁判上の紛争が生じた場合は、神戸地方裁判所を第一審の専属的合意管轄裁判所とします。
+
+■免責事項■
+音響モデルを利用されたことにより利用者に損害が発生した場合に、当方に軽度の過失が認められるときであっても、それにより直接かつ通常生じる範囲内の損害に限り責任を負い、その他の特別損害については責任を負いません。
+また、本利用規約は、予告なく内容を変更する場合があります。
+公式サイトのものを本利用規約の最新版とします。
+
+■連絡先■
+音響モデル製作者:
+アキヒロ
+ホームページ:
+http://akihiro0105.blog55.fc2.com/
+
+音声データ提供者:
+ロツ
+連絡先：
+twitter
+@imokiri
+
+■著作権■
+アキヒロ 音響モデル製作者
+ロツ 音声データ提供者

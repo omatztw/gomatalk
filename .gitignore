@@ -1,0 +1,4 @@
+gomatalk
+data/*.db
+config.toml
+.vscode/
