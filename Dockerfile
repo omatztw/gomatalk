@@ -46,8 +46,10 @@ RUN \
  cp MMDAgent_Example-1.8/Voice/mei/*.htsvoice /usr/share/open_jtalk/voices/. && \
  rm -rf MMDAgent_Example-1.8*
 
-RUN CGO_ENABLED=0 go get github.com/omatztw/gomatalk
+COPY .  /workspace/.
+
+RUN go build
 
 VOLUME /workspace/data
 
-CMD ["gomatalk", "-f", "config.toml"]
+CMD ["/workspace/gomatalk", "-f", "/workspace/config/config.toml"]
