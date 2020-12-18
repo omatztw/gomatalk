@@ -35,6 +35,16 @@ var (
 	}
 )
 
+func VoiceList() []string {
+	keys := make([]string, len(voices))
+	i := 0
+	for k := range voices {
+		keys[i] = k
+		i++
+	}
+	return keys
+}
+
 func CreateWav(speech Speech) (string, error) {
 	wavFileName := fmt.Sprintf("/tmp/voice-%d.wav", time.Now().UnixNano())
 	textFileName := fmt.Sprintf("/tmp/voice-%d.txt", time.Now().UnixNano())

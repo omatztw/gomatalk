@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"log"
 	"regexp"
@@ -15,11 +16,22 @@ import (
 // HelpReporter
 func HelpReporter(m *discordgo.MessageCreate) {
 	log.Println("INFO:", m.Author.Username, "send 'help'")
-	help := "```\nStandard Commands List\n" +
-		"**`" + o.DiscordPrefix + "help`** or **`" + o.DiscordPrefix + "h`**  ->  show help commands.\n" +
-		"**`" + o.DiscordPrefix + "join`** or **`" + o.DiscordPrefix + "j`**  ->  the bot join in to voice channel.\n" +
-		"**`" + o.DiscordPrefix + "leave`** or **`" + o.DiscordPrefix + "l`**  ->  the bot leave the voice channel.\n" +
-		"**`" + o.DiscordPrefix + "stop`**  ->  stop the player and remove the queue.\n```"
+	help := "```\nコマンド一覧\n" +
+		o.DiscordPrefix + "help or " + o.DiscordPrefix + "h  ->  コマンド一覧と簡単な説明を表示.\n" +
+		o.DiscordPrefix + "summon or " + o.DiscordPrefix + "s  ->  読み上げを開始.\n" +
+		o.DiscordPrefix + "bye or " + o.DiscordPrefix + "b  ->  読み上げを終了.\n" +
+		o.DiscordPrefix + "add_word or " + o.DiscordPrefix + "aw  ->  辞書登録. (" + o.DiscordPrefix + "aw 単語 読み" + ")\n" +
+		o.DiscordPrefix + "delete_word or " + o.DiscordPrefix + "dw  ->  辞書削除. (" + o.DiscordPrefix + "dw 単語" + ")\n" +
+		o.DiscordPrefix + "words_list or " + o.DiscordPrefix + "wl  ->  辞書一覧を表示.\n" +
+		o.DiscordPrefix + "status ->  現在の声の設定を表示.\n" +
+		o.DiscordPrefix + "update_voice or " + o.DiscordPrefix + "uv  ->  声の設定を変更. (" + o.DiscordPrefix + "uv voice speed tone intone threshold volume" + ")\n" +
+		"   voice: 声の種類 [" + strings.Join(VoiceList(), ",") + "]\n" +
+		"   speed: 話す速度 範囲(0.5~2.0)(初期値 1.0) \n" +
+		"   tone : 声のトーン 範囲(-20~20)(初期値 0.0) \n" +
+		"   intone : 声のイントネーション 範囲(0.0~4.0)(初期値 1.0) \n" +
+		"   threshold : ブツブツするときとか改善するかも?? 範囲(0.0~1.0)(初期値 0.5) \n" +
+		"   volume : 音量（dB） 範囲(-20~20)(初期値 1) \n" +
+		o.DiscordPrefix + "stop  ->  読み上げを一時停止.\n```"
 
 	ChMessageSend(m.ChannelID, help)
 	//ChMessageSendEmbed(m.ChannelID, "Help", help)
@@ -162,10 +174,10 @@ func StatusReporter(m *discordgo.MessageCreate) {
 func SetStatusHandler(m *discordgo.MessageCreate) {
 	commands := strings.Fields(m.Content)
 	if len(commands) != 7 {
-		log.Println("7 args require", m.Content)
 		HelpReporter(m)
 		return
 	}
+
 	keys := make([]string, 0, len(voices))
 	for k := range voices {
 		keys = append(keys, k)
@@ -182,6 +194,27 @@ func SetStatusHandler(m *discordgo.MessageCreate) {
 		HelpReporter(m)
 		return
 	}
+	if err := CheckRange(speed, 0.5, 2.0); err != nil {
+		HelpReporter(m)
+		return
+	}
+	if err := CheckRange(tone, -20, 20); err != nil {
+		HelpReporter(m)
+		return
+	}
+	if err := CheckRange(intone, 0, 4); err != nil {
+		HelpReporter(m)
+		return
+	}
+	if err := CheckRange(threshold, 0, 1); err != nil {
+		HelpReporter(m)
+		return
+	}
+	if err := CheckRange(volume, -20, 20); err != nil {
+		HelpReporter(m)
+		return
+	}
+
 	userInfo := UserInfo{}
 	userInfo.Voice = voice
 	userInfo.Speed, _ = strconv.ParseFloat(speed, 64)
@@ -228,11 +261,21 @@ func SpeechText(v *VoiceInstance, m *discordgo.MessageCreate) {
 			return
 		}
 	}
-	log.Println("Contents: ", content)
 	speech := Speech{content, user}
 	speechSig := SpeechSignal{speech, v}
 	go func() {
 		speechSignal <- speechSig
 	}()
 	// v.Talk(speech)
+}
+
+func CheckRange(val string, min, max float64) error {
+	fval, err := strconv.ParseFloat(val, 64)
+	if err != nil {
+		return err
+	}
+	if fval < min || max < fval {
+		return errors.New("out of range")
+	}
+	return nil
 }

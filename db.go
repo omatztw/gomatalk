@@ -3,8 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"log"
+	"math/rand"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -162,7 +161,6 @@ func PutUser(userID string, user UserInfo) error {
 	err = db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(rootBucketName))
 		encoded, err := json.Marshal(user)
-		log.Println("ENCODED", string(encoded))
 		if err != nil {
 			return err
 		}
@@ -183,10 +181,6 @@ func GetUserInfo(userID string) (UserInfo, error) {
 
 	db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(rootBucketName))
-		c := b.Cursor()
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			fmt.Printf("key=%s, value=%s\n", k, v)
-		}
 		v = b.Get([]byte(userID))
 		return nil
 	})
@@ -200,18 +194,23 @@ func GetUserInfo(userID string) (UserInfo, error) {
 	return user, nil
 }
 
+func random(min, max float64) float64 {
+	rand.Seed(time.Now().UnixNano())
+	return rand.Float64()*(max-min) + min
+}
+
 func InitUser(userID string) (UserInfo, error) {
+
+	rand.Seed(time.Now().UnixNano())
+	num := rand.Intn(len(voices))
+
 	user := UserInfo{}
-	user.Voice = "normal"
-	user.Speed = 1.0
-	user.Tone = 0.0
-	user.Intone = 1.0
-	user.Threshold = 0.5
+	user.Voice = VoiceList()[num]
+	user.Speed = random(0.5, 2)
+	user.Tone = random(-20, 20)
+	user.Intone = random(0, 4)
+	user.Threshold = random(0, 1)
 	user.Volume = 1.0
-	// err := CreateUserDB(userID)
-	// if err != nil {
-	// 	return user, err
-	// }
 	err := PutUser(userID, user)
 	if err != nil {
 		return user, err

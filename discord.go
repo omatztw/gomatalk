@@ -33,7 +33,6 @@ func DiscordConnect() (err error) {
 		log.Println("FATA:", err)
 		return
 	} // Login successful
-	log.Println("INFO: Bot user test")
 	log.Println("INFO: Bot is now running. Press CTRL-C to exit.")
 	initRoutine()
 	dg.UpdateStatus(0, o.DiscordStatus)
@@ -113,7 +112,6 @@ func initRoutine() {
 
 // ConnectHandler
 func ConnectHandler(s *discordgo.Session, connect *discordgo.Connect) {
-	log.Println("INFO: Connected!!")
 	s.UpdateStatus(0, o.DiscordStatus)
 }
 
@@ -141,7 +139,6 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 		return
 	}
 	userCount := UserCountVoiceChannel(v.voice.ChannelID)
-	log.Println("Status Update", userCount)
 	if userCount == 0 {
 		v.voice.Disconnect()
 		log.Println("INFO: Voice channel destroyed")
@@ -152,19 +149,6 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 		ChMessageSend(v.channelID, "すやぁ")
 	}
 }
-
-// // GuildDeleteHandler
-// func GuildDeleteHandler(s *discordgo.Session, guild *discordgo.GuildDelete) {
-// 	log.Println("INFO: Guild Delete:", guild.ID)
-// 	v := voiceInstances[guild.ID]
-// 	if v != nil {
-// 		v.Stop()
-// 		time.Sleep(200 * time.Millisecond)
-// 		mutex.Lock()
-// 		delete(voiceInstances, guild.ID)
-// 		mutex.Unlock()
-// 	}
-// }
 
 // MessageCreateHandler
 func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -188,7 +172,7 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			HelpReporter(m)
 		case "summon", "s":
 			JoinReporter(v, m, s)
-		case "leave", "l":
+		case "bye", "b":
 			LeaveReporter(v, m)
 		case "stop":
 			StopReporter(v, m)
