@@ -1,4 +1,13 @@
-FROM golang:1.15.6-buster
+FROM golang:1.15.6-buster as builder
+
+RUN mkdir -p /workspace
+WORKDIR /workspace
+
+COPY .  /workspace/.
+
+RUN go build
+
+FROM debian:buster-slim
 
 RUN apt update 
 RUN apt install -y build-essential curl unzip ffmpeg
@@ -13,7 +22,7 @@ RUN \
     cd hts_engine_API-1.10 && \ 
     ./configure && make && \
     make install && \
-    rm -rf hts_engine_API-1.10*
+    rm -rf /usr/local/src/hts_engine_API-1.10*
 
 RUN \
      cd /usr/local/src/  && \
@@ -23,7 +32,7 @@ RUN \
      ./configure --with-hts-engine-header-path=/usr/local/include --with-hts-engine-library-path=/usr/local/lib && \
      make && \
      make install && \
-     rm -rf open_jtalk-1.11*
+     rm -rf /usr/local/src/open_jtalk-1.11*
 
 RUN \
     mkdir -p /usr/share/open_jtalk/dic && \
@@ -46,10 +55,16 @@ RUN \
  cp MMDAgent_Example-1.8/Voice/mei/*.htsvoice /usr/share/open_jtalk/voices/. && \
  rm -rf MMDAgent_Example-1.8*
 
-COPY .  /workspace/.
 
-RUN go build
+RUN apt-get purge -y --auto-remove build-essential curl unzip
+RUN apt-get clean autoclean
+RUN apt-get autoremove --yes
+RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
 
+
+COPY --from=builder /workspace/gomatalk .
+COPY --from=builder /workspace/voices .
+RUN mkdir data
 VOLUME /workspace/data
 
 CMD ["/workspace/gomatalk", "-f", "/workspace/config/config.toml"]
