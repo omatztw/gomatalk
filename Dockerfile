@@ -63,7 +63,7 @@ RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 
 COPY --from=builder /workspace/gomatalk .
-COPY --from=builder /workspace/voices .
+COPY --from=builder /workspace/voices voices/.
 RUN mkdir data
 VOLUME /workspace/data
 
