@@ -48,7 +48,6 @@ func (v *VoiceInstance) PlayQueue(speech Speech) {
 }
 
 func (v *VoiceInstance) Talk(speech Speech) error {
-	ReplaceWords(v.guildID, &speech.Text)
 	fileName, err := CreateWav(speech)
 	defer os.Remove(fileName)
 	if err != nil {

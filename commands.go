@@ -252,6 +252,12 @@ func SpeechText(v *VoiceInstance, m *discordgo.MessageCreate) {
 	// Replace Custom Emoji String
 	rep := regexp.MustCompile(`<:([^:]+):\d{18}>`)
 	content = rep.ReplaceAllString(content, "$1")
+
+	urlRep := regexp.MustCompile(`https?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=#]*)?`)
+	content = urlRep.ReplaceAllString(content, "URL")
+
+	ReplaceWords(v.guildID, &content)
+
 	user, err := GetUserInfo(m.Author.ID)
 	if err != nil {
 		log.Println("INFO: Cannot Get User info")
