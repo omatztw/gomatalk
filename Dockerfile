@@ -66,5 +66,7 @@ COPY --from=builder /workspace/gomatalk .
 COPY --from=builder /workspace/voices voices/.
 RUN mkdir data
 VOLUME /workspace/data
+RUN mkdir wav
+VOLUME /workspace/wav
 
 CMD ["/workspace/gomatalk", "-f", "/workspace/config/config.toml"]

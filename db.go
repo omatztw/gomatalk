@@ -53,7 +53,12 @@ func CreateGuildDB(guildID string) error {
 			return err
 		}
 
-		_, err = g.CreateBucketIfNotExists([]byte("config"))
+		config, err := g.CreateBucketIfNotExists([]byte("config"))
+		if err != nil {
+			return err
+		}
+
+		_, err = config.CreateBucketIfNotExists([]byte("bot"))
 		if err != nil {
 			return err
 		}
@@ -61,6 +66,65 @@ func CreateGuildDB(guildID string) error {
 		return nil
 	})
 	return err
+}
+
+func Addbot(guildID, botID string, wavList []string) error {
+	db, err := bolt.Open(dbFileName, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(rootBucketName)).Bucket([]byte(guildID)).Bucket([]byte("config")).Bucket([]byte("bot"))
+		encoded, err := json.Marshal(wavList)
+		if err != nil {
+			return err
+		}
+		return b.Put([]byte(botID), encoded)
+	})
+	return err
+}
+
+func DeleteBot(guildID, botID string) error {
+	db, err := bolt.Open(dbFileName, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(rootBucketName)).Bucket([]byte(guildID)).Bucket([]byte("config")).Bucket([]byte("bot"))
+		return b.Delete([]byte(botID))
+	})
+	return err
+}
+
+func ListBots(guildID string) (map[string][]string, error) {
+	botsList := make(map[string][]string)
+	db, err := bolt.Open(dbFileName, 0600, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		return botsList, err
+	}
+	defer db.Close()
+
+	err = db.View(func(tx *bolt.Tx) error {
+		w := tx.Bucket([]byte(rootBucketName)).Bucket([]byte(guildID)).Bucket([]byte("config")).Bucket([]byte("bot"))
+		c := w.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			wavList := []string{}
+			err := json.Unmarshal(v, &wavList)
+			if err != nil {
+				return err
+			}
+			botsList[string(k)] = wavList
+		}
+		return nil
+	})
+	if err != nil {
+		return botsList, err
+	}
+	return botsList, nil
 }
 
 func AddWord(guildID, pre, post string) error {
@@ -197,6 +261,11 @@ func GetUserInfo(userID string) (UserInfo, error) {
 func random(min, max float64) float64 {
 	rand.Seed(time.Now().UnixNano())
 	return rand.Float64()*(max-min) + min
+}
+
+func randomInt(min, max int) int {
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(max-min) + min
 }
 
 func InitUser(userID string) (UserInfo, error) {

@@ -48,10 +48,16 @@ func (v *VoiceInstance) PlayQueue(speech Speech) {
 }
 
 func (v *VoiceInstance) Talk(speech Speech) error {
-	fileName, err := CreateWav(speech)
-	defer os.Remove(fileName)
-	if err != nil {
-		return err
+	var fileName string
+	var err error
+	if speech.WavFile != "" {
+		fileName = "wav/" + speech.WavFile
+	} else {
+		fileName, err = CreateWav(speech)
+		defer os.Remove(fileName)
+		if err != nil {
+			return err
+		}
 	}
 	dgvoice.PlayAudioFile(v.voice, fileName, v.stop)
 	return nil

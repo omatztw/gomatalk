@@ -23,6 +23,9 @@ func HelpReporter(m *discordgo.MessageCreate) {
 		o.DiscordPrefix + "add_word or " + o.DiscordPrefix + "aw  ->  辞書登録. (" + o.DiscordPrefix + "aw 単語 読み" + ")\n" +
 		o.DiscordPrefix + "delete_word or " + o.DiscordPrefix + "dw  ->  辞書削除. (" + o.DiscordPrefix + "dw 単語" + ")\n" +
 		o.DiscordPrefix + "words_list or " + o.DiscordPrefix + "wl  ->  辞書一覧を表示.\n" +
+		o.DiscordPrefix + "add_bot or " + o.DiscordPrefix + "ab  ->  BOTを読み上げ対象に登録. (" + o.DiscordPrefix + "ab <BOT ID> <WAV LIST>" + ")\n" +
+		o.DiscordPrefix + "delete_bot or " + o.DiscordPrefix + "db  ->  BOTを読み上げ対象から削除. (" + o.DiscordPrefix + "db <BOT ID>" + ")\n" +
+		o.DiscordPrefix + "bots_list or " + o.DiscordPrefix + "bl  ->  読み上げ対象BOTの一覧を表示.\n" +
 		o.DiscordPrefix + "status ->  現在の声の設定を表示.\n" +
 		o.DiscordPrefix + "update_voice or " + o.DiscordPrefix + "uv  ->  声の設定を変更. (" + o.DiscordPrefix + "uv voice speed tone intone threshold volume" + ")\n" +
 		"   voice: 声の種類 [" + strings.Join(VoiceList(), ",") + "]\n" +
@@ -89,6 +92,78 @@ func LeaveReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
 	mutex.Unlock()
 	dg.UpdateStatus(0, o.DiscordStatus)
 	ChMessageSend(v.channelID, "おつぅ")
+}
+
+func ListBotReporter(m *discordgo.MessageCreate) {
+	botList, err := ListBots(m.GuildID)
+	if err != nil {
+		return
+	}
+
+	msg := "```\n登録されているBOT一覧\n\n"
+	for k, v := range botList {
+		name := k
+		botUser, err := dg.User(k)
+		if err == nil {
+			name = botUser.Username
+		} else {
+			webhook, err := dg.Webhook(k)
+			if err == nil {
+				name = webhook.Name
+			}
+		}
+
+		msg += fmt.Sprintf("・BOT: %s(%s)、WAV LIST: %s\n", name, k, strings.Join(v, ","))
+	}
+	msg += "```"
+
+	ChMessageSend(m.ChannelID, msg)
+}
+
+func AddBotReporter(m *discordgo.MessageCreate) {
+
+	commands := splitString(m.Content)
+	if len(commands) < 2 {
+		HelpReporter(m)
+		return
+	}
+	var username string
+	botUser, err := dg.User(commands[1])
+	if err != nil {
+		webHook, err := dg.Webhook(commands[1])
+		if err != nil {
+			ChMessageSend(m.ChannelID, fmt.Sprintf("ID「%s」のBOTは見つかりませんでした。", commands[1]))
+			return
+		}
+		username = webHook.Name
+	} else {
+		username = botUser.Username
+	}
+	wavList := []string{}
+	if len(commands) > 2 {
+		wavList = strings.Split(commands[2], ",")
+	}
+	err = Addbot(m.GuildID, commands[1], wavList)
+	if err != nil {
+		ChMessageSend(m.ChannelID, fmt.Sprintf("BOT「%s」の登録に失敗しました。", username))
+		return
+	}
+	ChMessageSend(m.ChannelID, fmt.Sprintf("BOT「%s」を読み上げ対象に登録しました。", username))
+}
+
+func DeleteBotReporter(m *discordgo.MessageCreate) {
+
+	commands := splitString(m.Content)
+	if len(commands) != 2 {
+		HelpReporter(m)
+		return
+	}
+	err := DeleteBot(m.GuildID, commands[1])
+	if err != nil {
+		ChMessageSend(m.ChannelID, fmt.Sprintf("BOT ID「%s」の削除に失敗しました", commands[1]))
+		return
+	}
+	ChMessageSend(m.ChannelID, fmt.Sprintf("BOT ID「%s」を削除しました", commands[1]))
 }
 
 func ListWordsReporter(m *discordgo.MessageCreate) {
@@ -241,9 +316,6 @@ func StopReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
 }
 
 func SpeechText(v *VoiceInstance, m *discordgo.MessageCreate) {
-	if v.channelID != m.ChannelID {
-		return
-	}
 	content, err := m.Message.ContentWithMoreMentionsReplaced(v.session)
 	if err != nil {
 		log.Println("ERROR: Convert Error.")
@@ -267,7 +339,17 @@ func SpeechText(v *VoiceInstance, m *discordgo.MessageCreate) {
 			return
 		}
 	}
-	speech := Speech{content, user}
+	botList, _ := ListBots(v.guildID)
+	wavFileName := ""
+	for k, v := range botList {
+		if k == m.Author.ID {
+			if len(v) != 0 {
+				num := randomInt(0, len(v))
+				wavFileName = v[num]
+			}
+		}
+	}
+	speech := Speech{content, user, wavFileName}
 	speechSig := SpeechSignal{speech, v}
 	go func() {
 		speechSignal <- speechSig

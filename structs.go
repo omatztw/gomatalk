@@ -8,9 +8,11 @@ import (
 
 // Options gomatalk option
 type Options struct {
-	DiscordToken  string
-	DiscordStatus string
-	DiscordPrefix string
+	DiscordToken    string
+	DiscordStatus   string
+	DiscordPrefix   string
+	DiscordNumShard int
+	DiscordShardID  int
 }
 
 // UserInfo user information for talk
@@ -26,6 +28,7 @@ type UserInfo struct {
 type Speech struct {
 	Text     string
 	UserInfo UserInfo
+	WavFile  string
 }
 
 type SpeechSignal struct {

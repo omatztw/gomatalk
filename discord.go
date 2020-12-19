@@ -21,6 +21,10 @@ func DiscordConnect() (err error) {
 	// dg.AddHandler(GuildDeleteHandler)
 	dg.AddHandler(VoiceStatusUpdateHandler)
 	dg.AddHandler(ConnectHandler)
+	if o.DiscordNumShard > 1 {
+		dg.ShardCount = o.DiscordNumShard
+		dg.ShardID = o.DiscordShardID
+	}
 	// Open Websocket
 	err = dg.Open()
 	if err != nil {
@@ -152,12 +156,15 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 
 // MessageCreateHandler
 func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-
-	if m.Author.Bot {
-		return
-	}
-
 	guildID := SearchGuild(m.ChannelID)
+	botList, _ := ListBots(guildID)
+	isSpecial := false
+	if m.Author.Bot {
+		if _, ok := botList[m.Author.ID]; !ok {
+			return
+		}
+		isSpecial = true
+	}
 	v := voiceInstances[guildID]
 	if strings.HasPrefix(m.Content, o.DiscordPrefix) {
 		content := strings.Replace(m.Content, o.DiscordPrefix, "", 1)
@@ -186,12 +193,21 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			StatusReporter(m)
 		case "update_voice", "uv":
 			SetStatusHandler(m)
+		case "add_bot", "ab":
+			AddBotReporter(m)
+		case "delete_bot", "db":
+			DeleteBotReporter(m)
+		case "bots_list", "bl":
+			ListBotReporter(m)
 		default:
 			return
 		}
 		return
 	}
 	if v != nil {
+		if !isSpecial && v.channelID != m.ChannelID {
+			return
+		}
 		SpeechText(v, m)
 	}
 }

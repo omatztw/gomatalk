@@ -1,4 +1,5 @@
 gomatalk
 data/*.db
-config.toml
+*.toml
 .vscode/
+wav/*.wav

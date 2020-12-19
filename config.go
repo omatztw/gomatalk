@@ -42,5 +42,7 @@ func LoadConfig(filename string) (err error) {
 	if o.DiscordPrefix = viper.GetString("discord.prefix"); o.DiscordPrefix == "" {
 		return errors.New("'prefix' must be present in config file")
 	}
+	o.DiscordNumShard = viper.GetInt("discord.shardCount")
+	o.DiscordShardID = viper.GetInt("discord.shardID")
 	return nil
 }
