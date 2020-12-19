@@ -33,7 +33,7 @@ https://github.com/omatztw/omatalk をGoでリメイク
 ### 実行
 
 ```
-sudo docker run -it -v $PWD/data:/workspace/data -v $PWD/config.toml:/workspace/config/config.toml gomatalk
+sudo docker run -it -v $PWD/data:/workspace/data -v $PWD/config.toml:/workspace/config/config.toml omatztw/gomatalk:latest
 ```
 
 Dockerの使い方は省略。
