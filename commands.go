@@ -83,7 +83,6 @@ func LeaveReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
 		log.Println("INFO: The bot is not joined in a voice channel")
 		return
 	}
-	v.Stop()
 	time.Sleep(200 * time.Millisecond)
 	v.voice.Disconnect()
 	log.Println("INFO: Voice channel destroyed")

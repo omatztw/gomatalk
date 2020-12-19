@@ -65,7 +65,9 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 }
 
 func (v *VoiceInstance) Stop() {
-	v.stop <- true
+	if v.speaking {
+		v.stop <- true
+	}
 }
 
 func Exists(filename string) bool {
