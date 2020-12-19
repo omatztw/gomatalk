@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/bwmarrin/dgvoice"
@@ -79,8 +80,15 @@ func ReplaceWords(guildID string, text *string) error {
 		return err
 	}
 
-	for k, v := range wordList {
-		*text = strings.Replace(*text, k, v, -1)
+	// Replace long word first
+	keys := make([]string, 0, len(wordList))
+	for k := range wordList {
+		keys = append(keys, k)
 	}
+	sort.Slice(keys, func(i, j int) bool { return len(keys[i]) > len(keys[j]) })
+	for _, k := range keys {
+		*text = strings.Replace(*text, k, wordList[k], -1)
+	}
+
 	return nil
 }
