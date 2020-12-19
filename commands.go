@@ -56,12 +56,12 @@ func JoinReporter(v *VoiceInstance, m *discordgo.MessageCreate, s *discordgo.Ses
 		voiceInstances[guildID] = v
 		v.guildID = guildID
 		v.session = s
-		v.channelID = m.ChannelID
 		v.stop = make(chan bool)
 		mutex.Unlock()
 		//v.InitVoice()
 	}
 	var err error
+	v.channelID = m.ChannelID
 	v.voice, err = dg.ChannelVoiceJoin(v.guildID, voiceChannelID, false, false)
 	if err != nil {
 		v.Stop()
