@@ -62,8 +62,14 @@ func CreateWav(speech Speech) (string, error) {
 		"-jf", fmt.Sprintf("%g", speech.UserInfo.Intone),
 		"-u", fmt.Sprintf("%g", speech.UserInfo.Threshold),
 		"-g", fmt.Sprintf("%g", speech.UserInfo.Volume),
-		textFileName,
 	}
+
+	if speech.UserInfo.AllPass > 0 {
+		cmd = append(cmd, "-a")
+		cmd = append(cmd, fmt.Sprintf("%g", speech.UserInfo.AllPass))
+	}
+
+	cmd = append(cmd, textFileName)
 
 	run := exec.Command("open_jtalk", cmd...)
 

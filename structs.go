@@ -22,6 +22,7 @@ type UserInfo struct {
 	Tone      float64
 	Intone    float64
 	Threshold float64
+	AllPass   float64
 	Volume    float64
 }
 

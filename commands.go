@@ -33,6 +33,7 @@ func HelpReporter(m *discordgo.MessageCreate) {
 		"   tone : 声のトーン 範囲(-20~20)(初期値 0.0) \n" +
 		"   intone : 声のイントネーション 範囲(0.0~4.0)(初期値 1.0) \n" +
 		"   threshold : ブツブツするときとか改善するかも?? 範囲(0.0~1.0)(初期値 0.5) \n" +
+		"   allpass : よくわからん 範囲(0 - 1.0) (0はauto)  \n" +
 		"   volume : 音量（dB） 範囲(-20~20)(初期値 1) \n" +
 		o.DiscordPrefix + "stop  ->  読み上げを一時停止.\n```"
 
@@ -228,12 +229,13 @@ func StatusReporter(m *discordgo.MessageCreate) {
 		log.Println("ERROR: Cannot get user information.")
 		return
 	}
-	msg := fmt.Sprintf("voice: %s, speed: %g, tone: %g, intone: %g, threshold: %g, volume: %g\n%suv %s %g %g %g %g %g",
+	msg := fmt.Sprintf("voice: %s, speed: %g, tone: %g, intone: %g, threshold: %g, allpass: %g, volume: %g\n%suv %s %g %g %g %g %g %g",
 		userInfo.Voice,
 		userInfo.Speed,
 		userInfo.Tone,
 		userInfo.Intone,
 		userInfo.Threshold,
+		userInfo.AllPass,
 		userInfo.Volume,
 		o.DiscordPrefix,
 		userInfo.Voice,
@@ -241,13 +243,14 @@ func StatusReporter(m *discordgo.MessageCreate) {
 		userInfo.Tone,
 		userInfo.Intone,
 		userInfo.Threshold,
+		userInfo.AllPass,
 		userInfo.Volume)
 	ChMessageSendEmbed(m.ChannelID, msg, "", *m.Author)
 }
 
 func SetStatusHandler(m *discordgo.MessageCreate) {
 	commands := strings.Fields(m.Content)
-	if len(commands) != 7 {
+	if len(commands) != 8 {
 		HelpReporter(m)
 		return
 	}
@@ -261,7 +264,8 @@ func SetStatusHandler(m *discordgo.MessageCreate) {
 	tone := commands[3]
 	intone := commands[4]
 	threshold := commands[5]
-	volume := commands[6]
+	allpass := commands[6]
+	volume := commands[7]
 	_, ok := voices[voice]
 	if !ok {
 		log.Println("Not find key", voice)
@@ -288,6 +292,10 @@ func SetStatusHandler(m *discordgo.MessageCreate) {
 		HelpReporter(m)
 		return
 	}
+	if err := CheckRange(allpass, 0, 1); err != nil {
+		HelpReporter(m)
+		return
+	}
 
 	userInfo := UserInfo{}
 	userInfo.Voice = voice
@@ -295,6 +303,7 @@ func SetStatusHandler(m *discordgo.MessageCreate) {
 	userInfo.Tone, _ = strconv.ParseFloat(tone, 64)
 	userInfo.Intone, _ = strconv.ParseFloat(intone, 64)
 	userInfo.Threshold, _ = strconv.ParseFloat(threshold, 64)
+	userInfo.AllPass, _ = strconv.ParseFloat(allpass, 64)
 	userInfo.Volume, _ = strconv.ParseFloat(volume, 64)
 
 	PutUser(m.Author.ID, userInfo)

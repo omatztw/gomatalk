@@ -279,6 +279,7 @@ func InitUser(userID string) (UserInfo, error) {
 	user.Tone = random(-20, 20)
 	user.Intone = random(0, 4)
 	user.Threshold = random(0, 1)
+	user.AllPass = 0
 	user.Volume = 1.0
 	err := PutUser(userID, user)
 	if err != nil {
