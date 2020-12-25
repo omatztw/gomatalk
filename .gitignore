@@ -3,3 +3,4 @@ data/*.db
 *.toml
 .vscode/
 wav/*.wav
+voices/*.htsvoice
