@@ -24,7 +24,22 @@ https://github.com/omatztw/omatalk をGoでリメイク
 
 音響モデルを各自ダウンロードする必要があります。   
 「音響モデル Open Jtalk」等で検索すると出てきます。  
-ダウンロードしたファイルは`voices`というフォルダに格納してください。  
+ダウンロードしたファイルは`voices`というフォルダに格納してください。(拡張子は.htsvoice)
+例えば、`voices/ai.htsvoice`というファイルが格納されている必要があります。
+
+以下の名前のファイルを付けるとコード変更無しでBot設定出来るようになっています。  
+それ以外のファイル名を利用したい場合はコードの変更が必要になります。  
+
+* ai.htsvoice
+* akesato.htsvoice
+* ikuru.htsvoice
+* kanata.htsvoice
+* mizuki.htsvoice
+* momo.htsvoice
+* row.htsvoice
+* taro.htsvoice
+* wamea.htsvoice
+* yoe.htsvoice
 
 ### 設定
 
