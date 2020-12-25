@@ -63,10 +63,11 @@ RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 
 COPY --from=builder /workspace/gomatalk .
-COPY --from=builder /workspace/voices voices/.
 RUN mkdir data
 VOLUME /workspace/data
 RUN mkdir wav
 VOLUME /workspace/wav
+RUN mkdir voices
+VOLUME /workspace/voices
 
 CMD ["/workspace/gomatalk", "-f", "/workspace/config/config.toml"]

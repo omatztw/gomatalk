@@ -20,6 +20,12 @@ https://github.com/omatztw/omatalk をGoでリメイク
 * コピーしたURLを適当なブラウザで開く
 * Discord bot招待ページに飛ぶので、招待したいサーバーを選択して招待する
 
+### 音響モデルの準備
+
+音響モデルを各自ダウンロードする必要があります。   
+「音響モデル Open Jtalk」等で検索すると出てきます。  
+ダウンロードしたファイルは`voices`というフォルダに格納してください。  
+
 ### 設定
 
 `config.toml`を作成する。書き方は[config.toml.sample](config.toml.sample)を参照
@@ -33,7 +39,7 @@ https://github.com/omatztw/omatalk をGoでリメイク
 ### 実行
 
 ```
-sudo docker run -it -v $PWD/data:/workspace/data -v $PWD/config.toml:/workspace/config/config.toml omatztw/gomatalk:latest
+sudo docker run -it -v $PWD/data:/workspace/data -v $PWD/wav:/workspace/wav -v $PWD/config.toml:/workspace/config/config.toml -v $PWD/voices:/workspace/voices omatztw/gomatalk:latest
 ```
 
 Dockerの使い方は省略。
