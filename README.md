@@ -38,6 +38,9 @@ https://github.com/omatztw/omatalk をGoでリメイク
 * momo.htsvoice
 * row.htsvoice
 * taro.htsvoice
+* taro_sad.htsvoice
+* taro_angry.htsvoice
+* taro_happy.htsvoice
 * wamea.htsvoice
 * yoe.htsvoice
 
