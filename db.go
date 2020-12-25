@@ -271,7 +271,7 @@ func randomInt(min, max int) int {
 func InitUser(userID string) (UserInfo, error) {
 
 	rand.Seed(time.Now().UnixNano())
-	num := rand.Intn(len(voices))
+	num := rand.Intn(len(Voices()))
 
 	user := UserInfo{}
 	user.Voice = VoiceList()[num]

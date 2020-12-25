@@ -255,8 +255,8 @@ func SetStatusHandler(m *discordgo.MessageCreate) {
 		return
 	}
 
-	keys := make([]string, 0, len(voices))
-	for k := range voices {
+	keys := make([]string, 0, len(Voices()))
+	for k := range Voices() {
 		keys = append(keys, k)
 	}
 	voice := commands[1]
@@ -266,7 +266,7 @@ func SetStatusHandler(m *discordgo.MessageCreate) {
 	threshold := commands[5]
 	allpass := commands[6]
 	volume := commands[7]
-	_, ok := voices[voice]
+	_, ok := Voices()[voice]
 	if !ok {
 		log.Println("Not find key", voice)
 		HelpReporter(m)

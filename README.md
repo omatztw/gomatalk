@@ -20,29 +20,14 @@ https://github.com/omatztw/omatalk をGoでリメイク
 * コピーしたURLを適当なブラウザで開く
 * Discord bot招待ページに飛ぶので、招待したいサーバーを選択して招待する
 
-### 音響モデルの準備
+### 音響モデルのカスタマイズ
 
-音響モデルを各自ダウンロードする必要があります。   
+htsvoice形式の音響モデルを利用することが出来ます。   
 「音響モデル Open Jtalk」等で検索すると出てきます。  
 ダウンロードしたファイルは`voices`というフォルダに格納してください。(拡張子は.htsvoice)
-例えば、`voices/ai.htsvoice`というファイルが格納されている必要があります。
+例えば、`voices/ai.htsvoice`というファイルが格納されている必要があります。  
 
-以下の名前のファイルを付けるとコード変更無しでBot設定出来るようになっています。  
-それ以外のファイル名を利用したい場合はコードの変更が必要になります。  
-
-* ai.htsvoice
-* akesato.htsvoice
-* ikuru.htsvoice
-* kanata.htsvoice
-* mizuki.htsvoice
-* momo.htsvoice
-* row.htsvoice
-* taro.htsvoice
-* taro_sad.htsvoice
-* taro_angry.htsvoice
-* taro_happy.htsvoice
-* wamea.htsvoice
-* yoe.htsvoice
+`<prefix>status`コマンドでボイスが追加されているか確認することが出来ます。
 
 ### 設定
 
@@ -78,7 +63,7 @@ Dockerの使い方は省略。
 %bots_list or %bl  ->  読み上げ対象BOTの一覧を表示.
 %status ->  現在の声の設定を表示.
 %update_voice or %uv  ->  声の設定を変更. (%uv voice speed tone intone threshold volume)
-   voice: 声の種類 [male,taro,row,normal,bashful,ikuru,wamea,angry,momo,akesato,kanata,mizuki,happy,sad,yoe,ai]
+   voice: 声の種類 [male,normal,bashful,angry,happy,sad]
    speed: 話す速度 範囲(0.5~2.0)(初期値 1.0) 
    tone : 声のトーン 範囲(-20~20)(初期値 0.0) 
    intone : 声のイントネーション 範囲(0.0~4.0)(初期値 1.0) 
