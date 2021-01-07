@@ -144,15 +144,17 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 	}
 	userCount := UserCountVoiceChannel(v.voice.ChannelID)
 	if userCount == 0 {
+		v.Lock()
+		defer v.Unlock()
+		if !v.voice.Ready {
+			log.Println("INFO: Voice channel has already been destroyed")
+			return
+		}
 		v.voice.Disconnect()
 		log.Println("INFO: Voice channel destroyed")
 		mutex.Lock()
-		defer mutex.Unlock()
-		if still := voiceInstances[voice.GuildID]; still == nil {
-			log.Println("INFO: Voice channel has already been destroyed. ignore.")
-			return
-		}
 		delete(voiceInstances, v.guildID)
+		mutex.Unlock()
 		ChMessageSend(v.channelID, "すやぁ")
 	}
 }

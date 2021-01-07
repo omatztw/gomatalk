@@ -38,6 +38,7 @@ type SpeechSignal struct {
 }
 
 type VoiceInstance struct {
+	sync.Mutex
 	voice      *discordgo.VoiceConnection
 	session    *discordgo.Session
 	queueMutex sync.Mutex
