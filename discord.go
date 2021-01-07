@@ -147,9 +147,12 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 		v.voice.Disconnect()
 		log.Println("INFO: Voice channel destroyed")
 		mutex.Lock()
+		defer mutex.Unlock()
+		if still := voiceInstances[voice.GuildID]; still == nil {
+			log.Println("INFO: Voice channel has already been destroyed. ignore.")
+			return
+		}
 		delete(voiceInstances, v.guildID)
-		mutex.Unlock()
-		dg.UpdateStatus(0, o.DiscordStatus)
 		ChMessageSend(v.channelID, "すやぁ")
 	}
 }
