@@ -26,6 +26,7 @@ func HelpReporter(m *discordgo.MessageCreate) {
 		o.DiscordPrefix + "add_bot or " + o.DiscordPrefix + "ab  ->  BOTを読み上げ対象に登録. (" + o.DiscordPrefix + "ab <BOT ID> <WAV LIST>" + ")\n" +
 		o.DiscordPrefix + "delete_bot or " + o.DiscordPrefix + "db  ->  BOTを読み上げ対象から削除. (" + o.DiscordPrefix + "db <BOT ID>" + ")\n" +
 		o.DiscordPrefix + "bots_list or " + o.DiscordPrefix + "bl  ->  読み上げ対象BOTの一覧を表示.\n" +
+		o.DiscordPrefix + "random or " + o.DiscordPrefix + "r  ->  自分の声をﾗﾝﾀﾞﾑで変更する.\n" +
 		o.DiscordPrefix + "status ->  現在の声の設定を表示.\n" +
 		o.DiscordPrefix + "update_voice or " + o.DiscordPrefix + "uv  ->  声の設定を変更. (" + o.DiscordPrefix + "uv voice speed tone intone threshold volume" + ")\n" +
 		"   voice: 声の種類 [" + strings.Join(VoiceList(), ",") + "]\n" +
