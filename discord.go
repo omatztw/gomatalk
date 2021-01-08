@@ -204,6 +204,8 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			DeleteBotReporter(m)
 		case "bots_list", "bl":
 			ListBotReporter(m)
+		case "random", "r":
+			MakeRandomHandler(m)
 		default:
 			return
 		}

@@ -248,6 +248,12 @@ func StatusReporter(m *discordgo.MessageCreate) {
 	ChMessageSendEmbed(m.ChannelID, msg, "", *m.Author)
 }
 
+func MakeRandomHandler(m *discordgo.MessageCreate) {
+	user := MakeRandom()
+	PutUser(m.Author.ID, user)
+	StatusReporter(m)
+}
+
 func SetStatusHandler(m *discordgo.MessageCreate) {
 	commands := strings.Fields(m.Content)
 	if len(commands) != 8 {
