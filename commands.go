@@ -233,7 +233,15 @@ func StatusReporterForOther(userID string, m *discordgo.MessageCreate) {
 }
 
 func statusReporterInternal(userID string, m *discordgo.MessageCreate) {
-	user, _ := dg.User(userID)
+	user, err := dg.User(userID)
+	if err != nil {
+		webHook, err := dg.Webhook(userID)
+		if err != nil {
+			log.Println("ERROR: Cannot find user information.")
+			return
+		}
+		user = webHook.User
+	}
 	userInfo, err := GetUserInfo(userID)
 	if err != nil {
 		log.Println("ERROR: Cannot get user information.")
