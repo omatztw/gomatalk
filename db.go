@@ -258,9 +258,9 @@ func GetUserInfo(userID string) (UserInfo, error) {
 	return user, nil
 }
 
-func random(min, max float64) float64 {
+func random(min, max float32) float64 {
 	rand.Seed(time.Now().UnixNano())
-	return rand.Float64()*(max-min) + min
+	return float64(rand.Float32()*(max-min) + min)
 }
 
 func randomInt(min, max int) int {
