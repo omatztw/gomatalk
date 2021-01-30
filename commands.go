@@ -327,10 +327,18 @@ func SetStatusForOtherHandler(m *discordgo.MessageCreate) {
 	}
 	userID := commands[1]
 
-	user, _ := dg.User(userID)
-	if !user.Bot {
-		ChMessageSend(m.ChannelID, "声変えられるのはBotだけ( ˘ω˘ )")
-		return
+	user, err := dg.User(userID)
+	if err != nil {
+		_, err := dg.Webhook(userID)
+		if err != nil {
+			ChMessageSend(m.ChannelID, fmt.Sprintf("ID「%s」のBOTは見つかりませんでした。", userID))
+			return
+		}
+	} else {
+		if !user.Bot {
+			ChMessageSend(m.ChannelID, "声変えられるのはBotだけ( ˘ω˘ )")
+			return
+		}
 	}
 
 	voice := commands[2]
