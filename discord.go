@@ -206,6 +206,10 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			ListBotReporter(m)
 		case "random", "r":
 			MakeRandomHandler(m)
+		case "update_bot_voice", "ubv":
+			SetStatusForOtherHandler(m)
+		case "random_bot", "rb":
+			MakeRandomForOther(m)
 		default:
 			return
 		}

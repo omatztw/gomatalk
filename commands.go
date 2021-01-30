@@ -225,7 +225,16 @@ func splitString(s string) []string {
 }
 
 func StatusReporter(m *discordgo.MessageCreate) {
-	userInfo, err := GetUserInfo(m.Author.ID)
+	statusReporterInternal(m.Author.ID, m)
+}
+
+func StatusReporterForOther(userID string, m *discordgo.MessageCreate) {
+	statusReporterInternal(userID, m)
+}
+
+func statusReporterInternal(userID string, m *discordgo.MessageCreate) {
+	user, _ := dg.User(userID)
+	userInfo, err := GetUserInfo(userID)
 	if err != nil {
 		log.Println("ERROR: Cannot get user information.")
 		return
@@ -246,13 +255,102 @@ func StatusReporter(m *discordgo.MessageCreate) {
 		userInfo.Threshold,
 		userInfo.AllPass,
 		userInfo.Volume)
-	ChMessageSendEmbed(m.ChannelID, msg, "", *m.Author)
+	ChMessageSendEmbed(m.ChannelID, msg, "", *user)
+}
+
+func MakeRandomForOther(m *discordgo.MessageCreate) {
+	commands := strings.Fields(m.Content)
+	if len(commands) != 2 {
+		HelpReporter(m)
+		return
+	}
+	userID := commands[1]
+	user, _ := dg.User(userID)
+	if !user.Bot {
+		ChMessageSend(m.ChannelID, "声変えられるのはBotだけ( ˘ω˘ )")
+		return
+	}
+	makeRandomHandlerInternal(userID, m)
 }
 
 func MakeRandomHandler(m *discordgo.MessageCreate) {
+	makeRandomHandlerInternal(m.Author.ID, m)
+}
+
+func makeRandomHandlerInternal(userID string, m *discordgo.MessageCreate) {
 	user := MakeRandom()
-	PutUser(m.Author.ID, user)
-	StatusReporter(m)
+	PutUser(userID, user)
+	statusReporterInternal(userID, m)
+}
+
+func setStatusHandlerInternal(userID string, userInfo UserInfo, m *discordgo.MessageCreate) {
+	_, ok := Voices()[userInfo.Voice]
+	if !ok {
+		log.Println("Not find key", userInfo.Voice)
+		HelpReporter(m)
+		return
+	}
+	if err := CheckRange(userInfo.Speed, 0.5, 2.0); err != nil {
+		HelpReporter(m)
+		return
+	}
+	if err := CheckRange(userInfo.Tone, -20, 20); err != nil {
+		HelpReporter(m)
+		return
+	}
+	if err := CheckRange(userInfo.Intone, 0, 4); err != nil {
+		HelpReporter(m)
+		return
+	}
+	if err := CheckRange(userInfo.Threshold, 0, 1); err != nil {
+		HelpReporter(m)
+		return
+	}
+	if err := CheckRange(userInfo.Volume, -20, 20); err != nil {
+		HelpReporter(m)
+		return
+	}
+	if err := CheckRange(userInfo.AllPass, 0, 1); err != nil {
+		HelpReporter(m)
+		return
+	}
+	PutUser(userID, userInfo)
+	statusReporterInternal(userID, m)
+
+}
+
+func SetStatusForOtherHandler(m *discordgo.MessageCreate) {
+	commands := strings.Fields(m.Content)
+	if len(commands) != 9 {
+		HelpReporter(m)
+		return
+	}
+	userID := commands[1]
+
+	user, _ := dg.User(userID)
+	if !user.Bot {
+		ChMessageSend(m.ChannelID, "声変えられるのはBotだけ( ˘ω˘ )")
+		return
+	}
+
+	voice := commands[2]
+	speed := commands[3]
+	tone := commands[4]
+	intone := commands[5]
+	threshold := commands[6]
+	allpass := commands[7]
+	volume := commands[8]
+
+	userInfo := UserInfo{}
+	userInfo.Voice = voice
+	userInfo.Speed, _ = strconv.ParseFloat(speed, 32)
+	userInfo.Tone, _ = strconv.ParseFloat(tone, 32)
+	userInfo.Intone, _ = strconv.ParseFloat(intone, 32)
+	userInfo.Threshold, _ = strconv.ParseFloat(threshold, 32)
+	userInfo.AllPass, _ = strconv.ParseFloat(allpass, 32)
+	userInfo.Volume, _ = strconv.ParseFloat(volume, 32)
+
+	setStatusHandlerInternal(userID, userInfo, m)
 }
 
 func SetStatusHandler(m *discordgo.MessageCreate) {
@@ -262,10 +360,6 @@ func SetStatusHandler(m *discordgo.MessageCreate) {
 		return
 	}
 
-	keys := make([]string, 0, len(Voices()))
-	for k := range Voices() {
-		keys = append(keys, k)
-	}
 	voice := commands[1]
 	speed := commands[2]
 	tone := commands[3]
@@ -273,48 +367,17 @@ func SetStatusHandler(m *discordgo.MessageCreate) {
 	threshold := commands[5]
 	allpass := commands[6]
 	volume := commands[7]
-	_, ok := Voices()[voice]
-	if !ok {
-		log.Println("Not find key", voice)
-		HelpReporter(m)
-		return
-	}
-	if err := CheckRange(speed, 0.5, 2.0); err != nil {
-		HelpReporter(m)
-		return
-	}
-	if err := CheckRange(tone, -20, 20); err != nil {
-		HelpReporter(m)
-		return
-	}
-	if err := CheckRange(intone, 0, 4); err != nil {
-		HelpReporter(m)
-		return
-	}
-	if err := CheckRange(threshold, 0, 1); err != nil {
-		HelpReporter(m)
-		return
-	}
-	if err := CheckRange(volume, -20, 20); err != nil {
-		HelpReporter(m)
-		return
-	}
-	if err := CheckRange(allpass, 0, 1); err != nil {
-		HelpReporter(m)
-		return
-	}
 
 	userInfo := UserInfo{}
 	userInfo.Voice = voice
-	userInfo.Speed, _ = strconv.ParseFloat(speed, 64)
-	userInfo.Tone, _ = strconv.ParseFloat(tone, 64)
-	userInfo.Intone, _ = strconv.ParseFloat(intone, 64)
-	userInfo.Threshold, _ = strconv.ParseFloat(threshold, 64)
-	userInfo.AllPass, _ = strconv.ParseFloat(allpass, 64)
-	userInfo.Volume, _ = strconv.ParseFloat(volume, 64)
+	userInfo.Speed, _ = strconv.ParseFloat(speed, 32)
+	userInfo.Tone, _ = strconv.ParseFloat(tone, 32)
+	userInfo.Intone, _ = strconv.ParseFloat(intone, 32)
+	userInfo.Threshold, _ = strconv.ParseFloat(threshold, 32)
+	userInfo.AllPass, _ = strconv.ParseFloat(allpass, 32)
+	userInfo.Volume, _ = strconv.ParseFloat(volume, 32)
 
-	PutUser(m.Author.ID, userInfo)
-	StatusReporter(m)
+	setStatusHandlerInternal(m.Author.ID, userInfo, m)
 }
 
 func StopReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
@@ -372,12 +435,8 @@ func SpeechText(v *VoiceInstance, m *discordgo.MessageCreate) {
 	// v.Talk(speech)
 }
 
-func CheckRange(val string, min, max float64) error {
-	fval, err := strconv.ParseFloat(val, 64)
-	if err != nil {
-		return err
-	}
-	if fval < min || max < fval {
+func CheckRange(val float64, min, max float64) error {
+	if val < min || max < val {
 		return errors.New("out of range")
 	}
 	return nil
