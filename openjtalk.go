@@ -84,6 +84,7 @@ func WavGC() {
 						log.Println("FATA: Error DeleteWav():", err)
 					}
 					if info.ModTime().Before(time.Now().Add(-time.Minute * 10)) { // 10分前以前に作られたファイルは消去
+						log.Println("Garbage WAV found. Deleting...: " + file)
 						os.Remove(file)
 					}
 				}
