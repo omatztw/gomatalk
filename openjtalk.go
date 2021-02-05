@@ -83,7 +83,7 @@ func WavGC() {
 				for _, file := range files {
 					info, err := os.Stat(file)
 					if err != nil {
-						log.Println("FATA: Error DeleteWav():", err)
+						log.Println("FATA: Error WavGC():", err)
 						return
 					}
 					if info.ModTime().Before(time.Now().Add(-time.Minute * 10)) { // 10分前以前に作られたファイルは消去
