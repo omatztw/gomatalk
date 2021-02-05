@@ -68,6 +68,52 @@ func merge(m1, m2 map[string]string) map[string]string {
 	return (ans)
 }
 
+func WavGC() {
+	go func() {
+		t := time.NewTicker(30 * time.Minute) // 30分おきに検索
+		for {
+			select {
+			case <-t.C:
+				files, err := walkMatch("/tmp/", "voice-*.wav")
+				if err != nil {
+					log.Println("FATA: Error DeleteWav():", err)
+				}
+				for _, file := range files {
+					info, err := os.Stat(file)
+					if err != nil {
+						log.Println("FATA: Error DeleteWav():", err)
+					}
+					if info.ModTime().Before(time.Now().Add(-time.Minute * 10)) { // 10分前以前に作られたファイルは消去
+						os.Remove(file)
+					}
+				}
+			}
+		}
+	}()
+}
+
+func walkMatch(root, pattern string) ([]string, error) {
+    var matches []string
+    err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+        if err != nil {
+            return err
+        }
+        if info.IsDir() {
+            return nil
+        }
+        if matched, err := filepath.Match(pattern, filepath.Base(path)); err != nil {
+            return err
+        } else if matched {
+            matches = append(matches, path)
+        }
+        return nil
+    })
+    if err != nil {
+        return nil, err
+    }
+    return matches, nil
+}
+
 func CreateWav(speech Speech) (string, error) {
 	wavFileName := fmt.Sprintf("/tmp/voice-%d.wav", time.Now().UnixNano())
 	textFileName := fmt.Sprintf("/tmp/voice-%d.txt", time.Now().UnixNano())

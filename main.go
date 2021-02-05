@@ -31,5 +31,7 @@ func main() {
 		return
 	}
 
+	WavGC()
+
 	<-make(chan struct{})
 }
