@@ -5,6 +5,9 @@ WORKDIR /workspace
 
 COPY .  /workspace/.
 
+RUN apt update 
+RUN apt install -y libopus-dev
+
 RUN go build
 
 FROM debian:buster-slim
