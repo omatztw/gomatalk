@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	dictDir       string = "/usr/share/open_jtalk/dic"
+	dictDir       string = "/var/lib/mecab/dic/open-jtalk/naist-jdic"
 	sysVoiceDir   string = "/usr/share/open_jtalk/voices"
 	localVoiceDir string = "voices"
 )
