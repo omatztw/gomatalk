@@ -39,7 +39,7 @@ func DiscordConnect() (err error) {
 	} // Login successful
 	log.Println("INFO: Bot is now running. Press CTRL-C to exit.")
 	initRoutine()
-	dg.UpdateStatus(0, o.DiscordStatus)
+	dg.UpdateGameStatus(0, o.DiscordStatus)
 	return nil
 }
 
@@ -116,7 +116,7 @@ func initRoutine() {
 
 // ConnectHandler
 func ConnectHandler(s *discordgo.Session, connect *discordgo.Connect) {
-	s.UpdateStatus(0, o.DiscordStatus)
+	s.UpdateGameStatus(0, o.DiscordStatus)
 }
 
 // GuildCreateHandler

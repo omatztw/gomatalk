@@ -91,7 +91,7 @@ func LeaveReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
 	mutex.Lock()
 	delete(voiceInstances, v.guildID)
 	mutex.Unlock()
-	dg.UpdateStatus(0, o.DiscordStatus)
+	dg.UpdateGameStatus(0, o.DiscordStatus)
 	ChMessageSend(v.channelID, "おつぅ")
 }
 
