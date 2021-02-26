@@ -27,7 +27,7 @@ htsvoice形式の音響モデルを利用することが出来ます。
 ダウンロードしたファイルは`voices`というフォルダに格納してください。(拡張子は.htsvoice)
 例えば、`voices/ai.htsvoice`というファイルが格納されている必要があります。  
 
-`<prefix>status`コマンドでボイスが追加されているか確認することが出来ます。
+`<prefix>help`コマンドでボイスが追加されているか確認することが出来ます。
 
 ### 設定
 
@@ -42,10 +42,10 @@ htsvoice形式の音響モデルを利用することが出来ます。
 ### 実行
 
 ```
-sudo docker run -it -v $PWD/data:/workspace/data -v $PWD/wav:/workspace/wav -v $PWD/config.toml:/workspace/config/config.toml -v $PWD/voices:/workspace/voices omatztw/gomatalk:latest
+docker-compose up -d
 ```
 
-Dockerの使い方は省略。
+Docker composeの使い方は省略。
 
 ### Bot使い方
 

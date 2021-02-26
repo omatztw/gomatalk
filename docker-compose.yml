@@ -1,0 +1,12 @@
+version: "3.9" 
+services:
+  gomatalk:
+    image: omatztw/gomatalk
+    restart: always
+    environment:
+      TZ: Asia/Tokyo
+    volumes:
+      - ./wav:/workspace/wav
+      - ./config.toml:/workspace/config/config.toml
+      - ./data:/workspace/data
+      - ./voices:/workspace/voices
