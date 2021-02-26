@@ -44,5 +44,6 @@ func LoadConfig(filename string) (err error) {
 	}
 	o.DiscordNumShard = viper.GetInt("discord.shardCount")
 	o.DiscordShardID = viper.GetInt("discord.shardID")
+	o.Debug = viper.GetBool("discord.debug")
 	return nil
 }

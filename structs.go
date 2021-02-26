@@ -13,6 +13,7 @@ type Options struct {
 	DiscordPrefix   string
 	DiscordNumShard int
 	DiscordShardID  int
+	Debug bool
 }
 
 // UserInfo user information for talk

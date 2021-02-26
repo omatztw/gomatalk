@@ -25,6 +25,10 @@ func DiscordConnect() (err error) {
 		dg.ShardCount = o.DiscordNumShard
 		dg.ShardID = o.DiscordShardID
 	}
+
+	if o.Debug {
+		dg.LogLevel = discordgo.LogDebug
+	}
 	// Open Websocket
 	err = dg.Open()
 	if err != nil {

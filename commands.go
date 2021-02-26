@@ -73,6 +73,9 @@ func JoinReporter(v *VoiceInstance, m *discordgo.MessageCreate, s *discordgo.Ses
 		log.Println("ERROR: Error to join in a voice channel: ", err)
 		return
 	}
+	if o.Debug {
+		v.voice.LogLevel = discordgo.LogDebug
+	}
 	v.voice.Speaking(false)
 	log.Println("INFO: New Voice Instance created")
 	ChMessageSend(v.channelID, "おあ")
