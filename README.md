@@ -42,6 +42,10 @@ htsvoice形式の音響モデルを利用することが出来ます。
 ### 実行
 
 ```
+git clone https://github.com/omatztw/gomatalk.git
+cd gomatalk
+cp config.toml.sample config.toml
+vi config.toml #上記トークン情報等を記入
 docker-compose up -d
 ```
 
