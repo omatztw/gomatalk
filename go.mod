@@ -4,11 +4,21 @@ go 1.12
 
 require (
 	github.com/boltdb/bolt v1.3.1
-	github.com/bwmarrin/dgvoice v0.0.0-20170706020935-3c939eca8b2f
+	github.com/bwmarrin/dgvoice v0.0.0-20210225172318-caaac756e02e
 	github.com/bwmarrin/discordgo v0.23.2
-	github.com/fsnotify/fsnotify v1.4.7
+	github.com/fsnotify/fsnotify v1.4.9
+	github.com/magiconair/properties v1.8.4 // indirect
+	github.com/mitchellh/mapstructure v1.4.1 // indirect
+	github.com/pelletier/go-toml v1.8.1 // indirect
+	github.com/spf13/afero v1.5.1 // indirect
+	github.com/spf13/cast v1.3.1 // indirect
+	github.com/spf13/jwalterweatherman v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.7.1
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
-	golang.org/x/sys v0.0.0-20210225134936-a50acf3fe073 // indirect
+	golang.org/x/sys v0.0.0-20210305230114-8fe3ee5dd75b // indirect
+	golang.org/x/text v0.3.5 // indirect
+	gopkg.in/ini.v1 v1.62.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	layeh.com/gopus v0.0.0-20161224163843-0ebf989153aa // indirect
 )
