@@ -5,6 +5,7 @@ services:
     restart: always
     environment:
       TZ: Asia/Tokyo
+    tmpfs: /tmp
     volumes:
       - ./wav:/workspace/wav
       - ./config.toml:/workspace/config/config.toml
