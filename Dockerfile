@@ -22,14 +22,14 @@ RUN \
  mkdir -p /usr/share/open_jtalk/voices && \
  wget http://downloads.sourceforge.net/open-jtalk/hts_voice_nitech_jp_atr503_m001-1.05.tar.gz && \
  tar -zxvf hts_voice_nitech_jp_atr503_m001-1.05.tar.gz && \
- cp hts_voice_nitech_jp_atr503_m001-1.05/nitech_jp_atr503_m001.htsvoice  /usr/share/open_jtalk/voices/. && \
+ cp hts_voice_nitech_jp_atr503_m001-1.05/*  /usr/share/open_jtalk/voices/. && \
  rm -rf hts_voice_nitech_jp_atr503_m001-1.05*
 
 RUN \
  mkdir -p /usr/share/open_jtalk/voices && \
  wget https://downloads.sourceforge.net/project/mmdagent/MMDAgent_Example/MMDAgent_Example-1.8/MMDAgent_Example-1.8.zip && \
  unzip MMDAgent_Example-1.8.zip && \
- cp MMDAgent_Example-1.8/Voice/mei/*.htsvoice /usr/share/open_jtalk/voices/. && \
+ cp MMDAgent_Example-1.8/Voice/mei/* /usr/share/open_jtalk/voices/. && \
  rm -rf MMDAgent_Example-1.8*
 
 
