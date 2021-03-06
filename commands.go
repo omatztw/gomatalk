@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/csv"
 	"errors"
 	"fmt"
 	"log"
@@ -216,13 +215,16 @@ func DeleteWordReporter(m *discordgo.MessageCreate) {
 }
 
 func splitString(s string) []string {
-	// Split string
-	r := csv.NewReader(strings.NewReader(s))
-	r.Comma = ' ' // space
-	fields, err := r.Read()
-	if err != nil {
-		fmt.Println(err)
-		return []string{}
+	// Split string with space
+	re := regexp.MustCompile(`['"](\s*[^'"]+)\s*['"]|(\S+)`)
+	result := re.FindAllStringSubmatch(s, -1)
+	var fields []string
+	for _, val := range result {
+		if val[1] != "" {
+			fields = append(fields, val[1])
+		} else {
+			fields = append(fields, val[0])
+		}			
 	}
 	return fields
 }
