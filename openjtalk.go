@@ -38,7 +38,26 @@ func VoiceList() []string {
 }
 
 func Voices() map[string]string {
-	return merge(voices, LocalVoiceList())
+	voices = merge(voices, VoiceRoidList())
+	voices = merge(voices, LocalVoiceList())
+	return voices
+}
+
+func VoiceRoidList() map[string]string {
+	list := map[string]string{}
+	for _, v := range vo.Voice {
+		list[v.Name] = v.Name
+	}
+	return list
+}
+
+func isVoiceRoid(name string) bool {
+	for _, v := range vo.Voice {
+		if v.Name == name {
+			return true
+		}
+	}
+	return false
 }
 
 func LocalVoiceList() map[string]string {

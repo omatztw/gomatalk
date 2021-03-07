@@ -54,7 +54,11 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 	if speech.WavFile != "" {
 		fileName = "wav/" + speech.WavFile
 	} else {
-		fileName, err = CreateWav(speech)
+		if isVoiceRoid(speech.UserInfo.Voice) {
+			fileName, err = CreateVoiceroidWav(speech)
+		} else {
+			fileName, err = CreateWav(speech)
+		}
 		defer os.Remove(fileName)
 		if err != nil {
 			return err

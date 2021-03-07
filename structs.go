@@ -52,3 +52,12 @@ type VoiceInstance struct {
 	speaking   bool
 	stop       chan bool
 }
+
+type VoiceRoidConfig struct {
+	baseURL string
+	Voice []VoiceRoid
+}
+
+type VoiceRoid struct {
+	Name string
+}

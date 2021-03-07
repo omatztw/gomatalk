@@ -9,6 +9,7 @@ import (
 )
 
 var o = &Options{}
+var vo = &VoiceRoidConfig{}
 
 // Watch hot reload
 func Watch() {
@@ -45,5 +46,20 @@ func LoadConfig(filename string) (err error) {
 	o.DiscordNumShard = viper.GetInt("discord.shardCount")
 	o.DiscordShardID = viper.GetInt("discord.shardID")
 	o.Debug = viper.GetBool("discord.debug")
+	return nil
+}
+
+func LoadVoiceConfig(filename string) (err error) {
+	viper.SetConfigType("toml")
+	viper.SetConfigFile(filename)
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		return err
+	}
+	vo.baseURL = viper.GetString("voiceroid.baseURL")
+	var voiceRoid []VoiceRoid
+	viper.UnmarshalKey("voiceroid.voice", &voiceRoid)
+	vo.Voice = voiceRoid
 	return nil
 }
