@@ -252,7 +252,7 @@ func statusReporterInternal(userID string, m *discordgo.MessageCreate) {
 		log.Println("ERROR: Cannot get user information.")
 		return
 	}
-	msg := fmt.Sprintf("voice: %s, speed: %g, tone: %g, intone: %g, threshold: %g, allpass: %g, volume: %g\n%suv %s %g %g %g %g %g %g",
+	msg := fmt.Sprintf("voice: %s, speed: %.1f, tone: %.1f, intone: %.1f, threshold: %.1f, allpass: %.1f, volume: %.1f\n%suv %s %.1f %.1f %.1f %.1f %.1f %.1f",
 		userInfo.Voice,
 		userInfo.Speed,
 		userInfo.Tone,
