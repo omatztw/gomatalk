@@ -29,9 +29,9 @@ func HelpReporter(m *discordgo.MessageCreate) {
 		o.DiscordPrefix + "status ->  現在の声の設定を表示.\n" +
 		o.DiscordPrefix + "update_voice or " + o.DiscordPrefix + "uv  ->  声の設定を変更. (" + o.DiscordPrefix + "uv voice speed tone intone threshold volume" + ")\n" +
 		"   voice: 声の種類 [" + strings.Join(VoiceList(), ",") + "]\n" +
-		"   speed: 話す速度 範囲(0.5~2.0)(初期値 1.0) \n" +
-		"   tone : 声のトーン 範囲(-20~20)(初期値 0.0) \n" +
-		"   intone : 声のイントネーション 範囲(0.0~4.0)(初期値 1.0) \n" +
+		"   speed: 話す速度 範囲(0.5~2.0) \n" +
+		"   tone : 声のトーン 範囲(-20~20) [VOICEROIDは 0.5 ~ 4] \n" +
+		"   intone : 声のイントネーション 範囲(0.0~4.0)(初期値 1.0) [VOICEROIDは 0 ~ 2] \n" +
 		"   threshold : ブツブツするときとか改善するかも?? 範囲(0.0~1.0)(初期値 0.5) \n" +
 		"   allpass : よくわからん 範囲(0 - 1.0) (0はauto)  \n" +
 		"   volume : 音量（dB） 範囲(-20~20)(初期値 1) \n" +
@@ -311,10 +311,26 @@ func setStatusHandlerInternal(userID string, userInfo UserInfo, m *discordgo.Mes
 		HelpReporter(m)
 		return
 	}
+
+	if isVoiceRoid(userInfo.Voice) {
+		if err := CheckRange(userInfo.Tone, 0.5, 2); err != nil {
+			HelpReporter(m)
+			return
+		}
+	} 
+
 	if err := CheckRange(userInfo.Intone, 0, 4); err != nil {
 		HelpReporter(m)
 		return
 	}
+
+	if isVoiceRoid(userInfo.Voice) {
+		if err := CheckRange(userInfo.Intone, 0, 2); err != nil {
+			HelpReporter(m)
+			return
+		}
+	} 
+
 	if err := CheckRange(userInfo.Threshold, 0, 1); err != nil {
 		HelpReporter(m)
 		return
