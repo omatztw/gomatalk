@@ -75,7 +75,7 @@ func JoinReporter(v *VoiceInstance, m *discordgo.MessageCreate, s *discordgo.Ses
 	if o.Debug {
 		v.voice.LogLevel = discordgo.LogDebug
 	}
-	v.voice.Speaking(false)
+	// v.voice.Speaking(false)
 	log.Println("INFO: New Voice Instance created")
 	ChMessageSend(v.channelID, "おあ")
 }

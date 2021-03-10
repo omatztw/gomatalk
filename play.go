@@ -37,13 +37,13 @@ func (v *VoiceInstance) PlayQueue(speech Speech) {
 			}
 			v.nowTalking = v.QueueGetSpeech()
 			v.speaking = true
-			v.voice.Speaking(true)
+			// v.voice.Speaking(true)
 
 			v.Talk(v.nowTalking)
 
 			v.QueueRemoveFisrt()
 			v.speaking = false
-			v.voice.Speaking(false)
+			// v.voice.Speaking(false)
 		}
 	}()
 }
