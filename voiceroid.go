@@ -12,7 +12,11 @@ import (
 func CreateVoiceroidWav(speech Speech) (string, error) {
 	wavFileName := fmt.Sprintf("/tmp/voice-%d.wav", time.Now().UnixNano())
 
-	response, err := http.Get(fmt.Sprintf("%s/api/v1/audiofile?text=%s&name=%s&speed=%f&pitch=%f&range=%f", 
+	client := http.Client{
+		Timeout: 1 * time.Second,
+	}
+
+	response, err := client.Get(fmt.Sprintf("%s/api/v1/audiofile?text=%s&name=%s&speed=%f&pitch=%f&range=%f", 
 											vo.baseURL, 
 											url.QueryEscape(speech.Text), 
 											url.QueryEscape(speech.UserInfo.Voice), 
