@@ -440,7 +440,7 @@ func SpeechText(v *VoiceInstance, m *discordgo.MessageCreate) {
 	rep := regexp.MustCompile(`<:([^:]+):\d{18}>`)
 	content = rep.ReplaceAllString(content, "$1")
 	
-	urlRep := regexp.MustCompile(`https?://([\w-]+\.)+[\w-]+(/[-\w ./?%&=#]*)?`)
+	urlRep := regexp.MustCompile(`https?://[\w!\?/\+\-_~=;\.,\*&@#\$%\(\)'\[\]]+`)
 	content = urlRep.ReplaceAllString(content, "URL")
 
 	slashCommand := regexp.MustCompile(`</([^:]+):\d{18}>`)
