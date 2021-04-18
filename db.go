@@ -277,7 +277,7 @@ func MakeRandom() UserInfo {
 	user.Voice = VoiceList()[num]
 	user.Speed = random(0.5, 2)
 	if isVoiceRoid(user.Voice) {
-		user.Tone = random(0.5, 4)
+		user.Tone = random(0.5, 2)
 		user.Intone = random(0, 2)
 	} else {
 		user.Tone = random(-20, 20)
