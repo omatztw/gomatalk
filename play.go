@@ -29,8 +29,13 @@ func (v *VoiceInstance) PlayQueue(speech Speech) {
 		return
 	}
 	go func() {
-		v.voiceMutex.Lock()
-		defer v.voiceMutex.Unlock()
+		// v.voiceMutex.Lock()
+		// defer v.voiceMutex.Unlock()
+
+		// 複数チャンネルで同時に音声接続するとノイズが発生するため、globalのlockをかける
+		// この実装の場合、多くのチャンネルが同時に接続した場合に遅延が発生するのでできればチャネル毎のlockにしたいが。。
+		globalMutex.Lock()
+		defer globalMutex.Unlock()
 		for {
 			if len(v.queue) == 0 {
 				return
