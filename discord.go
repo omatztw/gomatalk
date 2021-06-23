@@ -141,21 +141,15 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 	if v.voice == nil {
 		return
 	}
-	log.Println(voice.ChannelID)
 	user, _ := dg.User(voice.UserID)
 	botUser, _ := dg.User("@me")
 
 	if voice.UserID == botUser.ID {
-		if voice == nil || voice.BeforeUpdate == nil {
+		if voice == nil || voice.BeforeUpdate == nil || voice.ChannelID == "" {
 			return
 		}
 		if voice.BeforeUpdate.ChannelID != voice.ChannelID {
 			v.voice, _ = dg.ChannelVoiceJoin(v.guildID, voice.ChannelID, false, false)
-			channel, err := dg.Channel(voice.ChannelID)
-			if err == nil {
-				nickname := botUser.Username + "(" + channel.Name + ")"
-				updateNickName(v, nickname)
-			}
 		}
 	}
 
@@ -163,6 +157,7 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 		// Ignore Bot
 		return
 	}
+
 	userCount := UserCountVoiceChannel(v.voice.ChannelID)
 	if userCount == 0 {
 		v.Lock()

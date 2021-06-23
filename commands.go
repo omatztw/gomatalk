@@ -78,7 +78,7 @@ func JoinReporter(v *VoiceInstance, m *discordgo.MessageCreate, s *discordgo.Ses
 	// v.voice.Speaking(false)
 	log.Println("INFO: New Voice Instance created")
 	botUser, _ := dg.User("@me")
-	channel, err := dg.Channel(voiceChannelID)
+	channel, err := dg.Channel(m.ChannelID)
 	if err == nil {
 		nickname := botUser.Username + "(" + channel.Name + ")"
 		updateNickName(v, nickname)
