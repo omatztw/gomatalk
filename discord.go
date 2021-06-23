@@ -146,6 +146,9 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 	botUser, _ := dg.User("@me")
 
 	if voice.UserID == botUser.ID {
+		if voice == nil || voice.BeforeUpdate == nil {
+			return
+		}
 		if voice.BeforeUpdate.ChannelID != voice.ChannelID {
 			v.voice, _ = dg.ChannelVoiceJoin(v.guildID, voice.ChannelID, false, false)
 			channel, err := dg.Channel(voice.ChannelID)
