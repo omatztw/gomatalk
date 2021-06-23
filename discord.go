@@ -141,8 +141,22 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 	if v.voice == nil {
 		return
 	}
+	log.Println(voice.ChannelID)
 	user, _ := dg.User(voice.UserID)
-	if user.Bot {
+	botUser, _ := dg.User("@me")
+
+	if voice.UserID == botUser.ID {
+		if voice.BeforeUpdate.ChannelID != voice.ChannelID {
+			v.voice, _ = dg.ChannelVoiceJoin(v.guildID, voice.ChannelID, false, false)
+			channel, err := dg.Channel(voice.ChannelID)
+			if err == nil {
+				nickname := botUser.Username + "(" + channel.Name + ")"
+				updateNickName(v, nickname)
+			}
+		}
+	}
+
+	if user.Bot && voice.UserID != botUser.ID {
 		// Ignore Bot
 		return
 	}
@@ -150,16 +164,19 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 	if userCount == 0 {
 		v.Lock()
 		defer v.Unlock()
-		if !v.voice.Ready {
+		if v.voice == nil {
 			log.Println("INFO: Voice channel has already been destroyed")
 			return
 		}
-		v.voice.Disconnect()
-		log.Println("INFO: Voice channel destroyed")
-		mutex.Lock()
-		delete(voiceInstances, v.guildID)
-		mutex.Unlock()
-		ChMessageSend(v.channelID, "すやぁ")
+		if v.session.VoiceConnections[v.guildID] != nil {
+			v.voice.Disconnect()
+			log.Println("INFO: Voice channel destroyed")
+			mutex.Lock()
+			delete(voiceInstances, v.guildID)
+			mutex.Unlock()
+			updateNickName(v, "")
+			ChMessageSend(v.channelID, "すやぁ")
+		}
 	}
 }
 

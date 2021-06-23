@@ -77,7 +77,17 @@ func JoinReporter(v *VoiceInstance, m *discordgo.MessageCreate, s *discordgo.Ses
 	}
 	// v.voice.Speaking(false)
 	log.Println("INFO: New Voice Instance created")
+	botUser, _ := dg.User("@me")
+	channel, err := dg.Channel(voiceChannelID)
+	if err == nil {
+		nickname := botUser.Username + "(" + channel.Name + ")"
+		updateNickName(v, nickname)
+	}
 	ChMessageSend(v.channelID, "おあ")
+}
+
+func updateNickName(v *VoiceInstance, nickname string) {
+	v.session.GuildMemberNickname(v.guildID, "@me", nickname)
 }
 
 // LeaveReporter
@@ -94,6 +104,7 @@ func LeaveReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
 	delete(voiceInstances, v.guildID)
 	mutex.Unlock()
 	dg.UpdateGameStatus(0, o.DiscordStatus)
+	updateNickName(v, "")
 	ChMessageSend(v.channelID, "おつぅ")
 }
 
@@ -224,7 +235,7 @@ func splitString(s string) []string {
 			fields = append(fields, val[1])
 		} else {
 			fields = append(fields, val[0])
-		}			
+		}
 	}
 	return fields
 }
@@ -317,7 +328,7 @@ func setStatusHandlerInternal(userID string, userInfo UserInfo, m *discordgo.Mes
 			HelpReporter(m)
 			return
 		}
-	} 
+	}
 
 	if err := CheckRange(userInfo.Intone, 0, 4); err != nil {
 		HelpReporter(m)
@@ -329,7 +340,7 @@ func setStatusHandlerInternal(userID string, userInfo UserInfo, m *discordgo.Mes
 			HelpReporter(m)
 			return
 		}
-	} 
+	}
 
 	if err := CheckRange(userInfo.Threshold, 0, 1); err != nil {
 		HelpReporter(m)
@@ -439,15 +450,15 @@ func SpeechText(v *VoiceInstance, m *discordgo.MessageCreate) {
 	// Replace Custom Emoji String
 	rep := regexp.MustCompile(`<:([^:]+):\d{18}>`)
 	content = rep.ReplaceAllString(content, "$1")
-	
+
 	urlRep := regexp.MustCompile(`https?://[\w!\?/\+\-_~=;\.,\*&@#\$%\(\)'\[\]]+`)
 	content = urlRep.ReplaceAllString(content, "URL")
 
 	slashCommand := regexp.MustCompile(`</([^:]+):\d{18}>`)
 	content = slashCommand.ReplaceAllString(content, "$1")
-	
+
 	ReplaceWords(v.guildID, &content)
-	
+
 	user, err := GetUserInfo(m.Author.ID)
 	if err != nil {
 		log.Println("INFO: Cannot Get User info")
