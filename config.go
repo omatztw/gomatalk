@@ -10,6 +10,7 @@ import (
 
 var o = &Options{}
 var vo = &VoiceRoidConfig{}
+var vv = &VoicevoxConfig{}
 
 // Watch hot reload
 func Watch() {
@@ -61,5 +62,20 @@ func LoadVoiceConfig(filename string) (err error) {
 	var voiceRoid []VoiceRoid
 	viper.UnmarshalKey("voiceroid.voice", &voiceRoid)
 	vo.Voice = voiceRoid
+	return nil
+}
+
+func LoadVoiceVoxConfig(filename string) (err error) {
+	viper.SetConfigType("toml")
+	viper.SetConfigFile(filename)
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		return err
+	}
+	vv.baseURL = viper.GetString("voicevox.baseURL")
+	var voiceVox []VoiceVox
+	viper.UnmarshalKey("voicevox.voice", &voiceVox)
+	vv.Voice = voiceVox
 	return nil
 }

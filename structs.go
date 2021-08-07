@@ -13,7 +13,7 @@ type Options struct {
 	DiscordPrefix   string
 	DiscordNumShard int
 	DiscordShardID  int
-	Debug bool
+	Debug           bool
 }
 
 // UserInfo user information for talk
@@ -55,9 +55,38 @@ type VoiceInstance struct {
 
 type VoiceRoidConfig struct {
 	baseURL string
-	Voice []VoiceRoid
+	Voice   []VoiceRoid
 }
 
 type VoiceRoid struct {
 	Name string
+}
+
+type VoicevoxConfig struct {
+	baseURL string
+	Voice   []VoiceVox
+}
+
+type VoiceVox struct {
+	Name string
+	Id   int
+}
+
+type AudioQuery struct {
+	AccentPhrases   []AccentPhrase `json:"accent_phrases"`
+	SpeedScale      float64        `json:"speedScale"`
+	PitchScale      float64        `json:"pitchScale"`
+	IntonationScale float64        `json:"intonationScale"`
+}
+
+type Mora struct {
+	Text      string  `json:"text,omitempty"`
+	Consonant string  `json:"consonant,omitempty"`
+	Vowel     string  `json:"vowel,omitempty"`
+	Pitch     float64 `json:"pitch"`
+}
+
+type AccentPhrase struct {
+	Moras  []Mora `json:"moras"`
+	Accent int    `json:"accent"`
 }

@@ -40,6 +40,7 @@ func VoiceList() []string {
 func Voices() map[string]string {
 	voices = merge(voices, VoiceRoidList())
 	voices = merge(voices, LocalVoiceList())
+	voices = merge(voices, VoicevoxList())
 	return voices
 }
 
@@ -51,8 +52,25 @@ func VoiceRoidList() map[string]string {
 	return list
 }
 
+func VoicevoxList() map[string]string {
+	list := map[string]string{}
+	for _, v := range vv.Voice {
+		list[v.Name] = v.Name
+	}
+	return list
+}
+
 func isVoiceRoid(name string) bool {
 	for _, v := range vo.Voice {
+		if v.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func isVoiceVox(name string) bool {
+	for _, v := range vv.Voice {
 		if v.Name == name {
 			return true
 		}
@@ -117,9 +135,9 @@ func WavGC() {
 
 func walkMatch(pattern string) ([]string, error) {
 	files, err := filepath.Glob(pattern)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 	return files, nil
 }
 

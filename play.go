@@ -61,6 +61,8 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 	} else {
 		if isVoiceRoid(speech.UserInfo.Voice) {
 			fileName, err = CreateVoiceroidWav(speech)
+		} else if isVoiceVox(speech.UserInfo.Voice) {
+			fileName, err = CreateVoiceVoxWav(speech)
 		} else {
 			fileName, err = CreateWav(speech)
 		}

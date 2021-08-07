@@ -22,6 +22,12 @@ func main() {
 		return
 	}
 
+	err = LoadVoiceVoxConfig(*filename)
+	if err != nil {
+		log.Println("FATA:", err)
+		return
+	}
+
 	// Hot reload
 	Watch()
 
