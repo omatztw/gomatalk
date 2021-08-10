@@ -20,7 +20,7 @@ func CreateAquestalkWav(speech Speech) (string, error) {
 		"-o", wavFileName,
 		"-f", textFileName,
 		"-s", fmt.Sprintf("%g", speech.UserInfo.Speed*100),
-		// "-g", fmt.Sprintf("%g", speech.UserInfo.Volume),
+		"-g", fmt.Sprintf("%g", (speech.UserInfo.Volume+20)*2.5),
 	}
 
 	run := exec.Command(aq.ExePath, cmd...)
