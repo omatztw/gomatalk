@@ -28,7 +28,7 @@ func HelpReporter(m *discordgo.MessageCreate) {
 		o.DiscordPrefix + "random or " + o.DiscordPrefix + "r  ->  自分の声をﾗﾝﾀﾞﾑで変更する.\n" +
 		o.DiscordPrefix + "status ->  現在の声の設定を表示.\n" +
 		o.DiscordPrefix + "update_voice or " + o.DiscordPrefix + "uv  ->  声の設定を変更. (" + o.DiscordPrefix + "uv voice speed tone intone threshold volume" + ")\n" +
-		"   voice: 声の種類 [" + strings.Join(VoiceList(), ",") + "]\n" +
+		"   voice: 声の種類 - " + strings.Join(VoiceList(), "\n                  - ") + "\n" +
 		"   speed: 話す速度 範囲(0.5~2.0) \n" +
 		"   tone : 声のトーン 範囲(-20~20) [VOICEROIDは 0.5 ~ 2] \n" +
 		"   intone : 声のイントネーション 範囲(0.0~4.0)(初期値 1.0) [VOICEROIDは 0 ~ 2] \n" +
