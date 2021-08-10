@@ -28,6 +28,12 @@ func main() {
 		return
 	}
 
+	err = LoadAquestalkConfig(*filename)
+	if err != nil {
+		log.Println("FATA:", err)
+		return
+	}
+
 	// Hot reload
 	Watch()
 

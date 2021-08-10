@@ -90,3 +90,12 @@ type AccentPhrase struct {
 	Moras  []Mora `json:"moras"`
 	Accent int    `json:"accent"`
 }
+
+type AquestalkConfig struct {
+	ExePath string
+	Voice   []Aquestalk
+}
+
+type Aquestalk struct {
+	Name string
+}

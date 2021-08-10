@@ -63,6 +63,8 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 			fileName, err = CreateVoiceroidWav(speech)
 		} else if isVoiceVox(speech.UserInfo.Voice) {
 			fileName, err = CreateVoiceVoxWav(speech)
+		} else if isAquesTalk(speech.UserInfo.Voice) {
+			fileName, err = CreateAquestalkWav(speech)
 		} else {
 			fileName, err = CreateWav(speech)
 		}

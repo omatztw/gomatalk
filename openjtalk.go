@@ -41,7 +41,16 @@ func Voices() map[string]string {
 	voices = merge(voices, VoiceRoidList())
 	voices = merge(voices, LocalVoiceList())
 	voices = merge(voices, VoicevoxList())
+	voices = merge(voices, AquestalkList())
 	return voices
+}
+
+func AquestalkList() map[string]string {
+	list := map[string]string{}
+	for _, v := range aq.Voice {
+		list[v.Name] = v.Name
+	}
+	return list
 }
 
 func VoiceRoidList() map[string]string {
@@ -71,6 +80,15 @@ func isVoiceRoid(name string) bool {
 
 func isVoiceVox(name string) bool {
 	for _, v := range vv.Voice {
+		if v.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func isAquesTalk(name string) bool {
+	for _, v := range aq.Voice {
 		if v.Name == name {
 			return true
 		}

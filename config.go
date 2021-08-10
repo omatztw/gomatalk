@@ -11,6 +11,7 @@ import (
 var o = &Options{}
 var vo = &VoiceRoidConfig{}
 var vv = &VoicevoxConfig{}
+var aq = &AquestalkConfig{}
 
 // Watch hot reload
 func Watch() {
@@ -77,5 +78,20 @@ func LoadVoiceVoxConfig(filename string) (err error) {
 	var voiceVox []VoiceVox
 	viper.UnmarshalKey("voicevox.voice", &voiceVox)
 	vv.Voice = voiceVox
+	return nil
+}
+
+func LoadAquestalkConfig(filename string) (err error) {
+	viper.SetConfigType("toml")
+	viper.SetConfigFile(filename)
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		return err
+	}
+	aq.ExePath = viper.GetString("aquestalk.exePath")
+	var aquestalk []Aquestalk
+	viper.UnmarshalKey("aquestalk.voice", &aquestalk)
+	aq.Voice = aquestalk
 	return nil
 }
