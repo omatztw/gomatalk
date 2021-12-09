@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/dgvoice"
 )
@@ -42,12 +43,14 @@ func (v *VoiceInstance) PlayQueue(speech Speech) {
 			}
 			v.nowTalking = v.QueueGetSpeech()
 			v.speaking = true
+			defer func() {
+				v.speaking = false
+			}()
 			// v.voice.Speaking(true)
 
 			v.Talk(v.nowTalking)
 
 			v.QueueRemoveFisrt()
-			v.speaking = false
 			// v.voice.Speaking(false)
 		}
 	}()
@@ -73,12 +76,22 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 			return err
 		}
 	}
-	dgvoice.PlayAudioFile(v.voice, fileName, v.stop)
-	return nil
+	c1 := make(chan string, 1)
+	go func() {
+		dgvoice.PlayAudioFile(v.voice, fileName, v.stop)
+		c1 <- "DONE"
+	}()
+	select {
+	case <-c1:
+		return nil
+	case <-time.After(30 * time.Second):
+		v.Stop(true)
+		return nil
+	}
 }
 
-func (v *VoiceInstance) Stop() {
-	if v.speaking {
+func (v *VoiceInstance) Stop(force bool) {
+	if v.speaking || force {
 		v.stop <- true
 	}
 }

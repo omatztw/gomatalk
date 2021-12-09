@@ -68,7 +68,7 @@ func JoinReporter(v *VoiceInstance, m *discordgo.MessageCreate, s *discordgo.Ses
 	v.channelID = m.ChannelID
 	v.voice, err = dg.ChannelVoiceJoin(v.guildID, voiceChannelID, false, false)
 	if err != nil {
-		v.Stop()
+		v.Stop(false)
 		log.Println("ERROR: Error to join in a voice channel: ", err)
 		return
 	}
@@ -438,7 +438,7 @@ func StopReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
 	if v.voice.ChannelID != voiceChannelID {
 		return
 	}
-	v.Stop()
+	v.Stop(true)
 }
 
 func SpeechText(v *VoiceInstance, m *discordgo.MessageCreate) {
