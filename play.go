@@ -79,7 +79,7 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 	c1 := make(chan string, 1)
 	go func() {
 		dgvoice.PlayAudioFile(v.voice, fileName, v.stop)
-		c1 <- "DONE"
+		close(c1)
 	}()
 	select {
 	case <-c1:
