@@ -449,6 +449,17 @@ func StopReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
 	v.Stop(false)
 }
 
+func RebootReporter(m *discordgo.MessageCreate) {
+	commands := strings.Fields(m.Content)
+	if len(commands) != 2 {
+		return
+	}
+	secret := commands[1]
+	if secret == o.Secret {
+		panic("Rebooting")
+	}
+}
+
 func SpeechText(v *VoiceInstance, m *discordgo.MessageCreate) {
 	content, err := m.Message.ContentWithMoreMentionsReplaced(v.session)
 	if err != nil {

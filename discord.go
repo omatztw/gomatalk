@@ -229,6 +229,8 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			SetStatusForOtherHandler(m)
 		case "random_bot", "rb":
 			MakeRandomForOther(m)
+		case "reboot":
+			RebootReporter(m)
 		default:
 			return
 		}

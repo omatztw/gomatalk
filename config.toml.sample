@@ -2,5 +2,6 @@
   token = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # Token bot
   status = "OM2JO | $help"
   prefix = "$"
+  secret = "secret"
 #  shardCount = 3
 #  shardID = 0
