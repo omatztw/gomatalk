@@ -50,20 +50,22 @@ func JoinReporter(v *VoiceInstance, m *discordgo.MessageCreate, s *discordgo.Ses
 		ChMessageSend(m.ChannelID, "<@"+m.Author.ID+"> まずVCにはいろ( ˘ω˘ )")
 		return
 	}
+	already := false
 	if v != nil {
-		log.Println("INFO: Voice Instance already created.")
-	} else {
-		guildID := SearchGuild(m.ChannelID)
-		// create new voice instance
-		mutex.Lock()
-		v = new(VoiceInstance)
-		voiceInstances[guildID] = v
-		v.guildID = guildID
-		v.session = s
-		v.stop = make(chan bool)
-		mutex.Unlock()
-		//v.InitVoice()
-	}
+		log.Println("INFO: Creating bran new voice instance.")
+		already = true
+	} // else {
+	guildID := SearchGuild(m.ChannelID)
+	// create new voice instance
+	mutex.Lock()
+	v = new(VoiceInstance)
+	voiceInstances[guildID] = v
+	v.guildID = guildID
+	v.session = s
+	v.stop = make(chan bool)
+	mutex.Unlock()
+	//v.InitVoice()
+	// }
 	var err error
 	v.channelID = m.ChannelID
 	v.voice, err = dg.ChannelVoiceJoin(v.guildID, voiceChannelID, false, false)
@@ -83,7 +85,9 @@ func JoinReporter(v *VoiceInstance, m *discordgo.MessageCreate, s *discordgo.Ses
 		nickname := botUser.Username + "(" + channel.Name + ")"
 		updateNickName(v, nickname)
 	}
-	ChMessageSend(v.channelID, "おあ")
+	if !already {
+		ChMessageSend(v.channelID, "おあ")
+	}
 }
 
 func updateNickName(v *VoiceInstance, nickname string) {
@@ -97,6 +101,11 @@ func LeaveReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
 		log.Println("INFO: The bot is not joined in a voice channel")
 		return
 	}
+	closeConnection(v)
+	ChMessageSend(v.channelID, "おつぅ")
+}
+
+func closeConnection(v *VoiceInstance) {
 	time.Sleep(200 * time.Millisecond)
 	v.voice.Disconnect()
 	log.Println("INFO: Voice channel destroyed")
@@ -105,7 +114,6 @@ func LeaveReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
 	mutex.Unlock()
 	dg.UpdateGameStatus(0, o.DiscordStatus)
 	updateNickName(v, "")
-	ChMessageSend(v.channelID, "おつぅ")
 }
 
 func ListBotReporter(m *discordgo.MessageCreate) {

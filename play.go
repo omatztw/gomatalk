@@ -48,7 +48,10 @@ func (v *VoiceInstance) PlayQueue(speech Speech) {
 			}()
 			// v.voice.Speaking(true)
 
-			v.Talk(v.nowTalking)
+			err := v.Talk(v.nowTalking)
+			if err != nil {
+				v.Stop(true)
+			}
 
 			v.QueueRemoveFisrt()
 			// v.voice.Speaking(false)
