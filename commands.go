@@ -446,7 +446,7 @@ func StopReporter(v *VoiceInstance, m *discordgo.MessageCreate) {
 	if v.voice.ChannelID != voiceChannelID {
 		return
 	}
-	v.Stop(true)
+	v.Stop(false)
 }
 
 func SpeechText(v *VoiceInstance, m *discordgo.MessageCreate) {

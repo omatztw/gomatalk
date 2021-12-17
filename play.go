@@ -50,7 +50,7 @@ func (v *VoiceInstance) PlayQueue(speech Speech) {
 
 			err := v.Talk(v.nowTalking)
 			if err != nil {
-				v.Stop(true)
+				v.Stop(false)
 			}
 
 			v.QueueRemoveFisrt()
