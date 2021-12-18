@@ -15,7 +15,7 @@ import (
 // HelpReporter
 func HelpReporter(m *discordgo.MessageCreate) {
 	log.Println("INFO:", m.Author.Username, "send 'help'")
-	help := "```\nコマンド一覧\n" +
+	help := "コマンド一覧\n" +
 		o.DiscordPrefix + "help or " + o.DiscordPrefix + "h  ->  コマンド一覧と簡単な説明を表示.\n" +
 		o.DiscordPrefix + "summon or " + o.DiscordPrefix + "s  ->  読み上げを開始.\n" +
 		o.DiscordPrefix + "bye or " + o.DiscordPrefix + "b  ->  読み上げを終了.\n" +
@@ -35,9 +35,10 @@ func HelpReporter(m *discordgo.MessageCreate) {
 		"   threshold : ブツブツするときとか改善するかも?? 範囲(0.0~1.0)(初期値 0.5) \n" +
 		"   allpass : よくわからん 範囲(0 - 1.0) (0はauto)  \n" +
 		"   volume : 音量（dB） 範囲(-20~20)(初期値 1) \n" +
-		o.DiscordPrefix + "stop  ->  読み上げを一時停止.\n```"
-
-	ChMessageSend(m.ChannelID, help)
+		o.DiscordPrefix + "stop  ->  読み上げを一時停止."
+	log.Println("", m.ChannelID)
+	ChFileSend(m.ChannelID, "help.txt", help)
+	// ChMessageSend(m.ChannelID, help)
 	//ChMessageSendEmbed(m.ChannelID, "Help", help)
 }
 

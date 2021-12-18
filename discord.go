@@ -93,6 +93,10 @@ func ChMessageSend(textChannelID, message string) {
 	}
 }
 
+func ChFileSend(textChannelID, name, message string) {
+	dg.ChannelFileSend(textChannelID, name, strings.NewReader(message))
+}
+
 // ChMessageSendEmbed send an embeded messages.
 func ChMessageSendEmbed(textChannelID, title, description string, user discordgo.User) {
 	embed := discordgo.MessageEmbed{}

@@ -74,17 +74,24 @@ type VoiceVox struct {
 }
 
 type AudioQuery struct {
-	AccentPhrases   []AccentPhrase `json:"accent_phrases"`
-	SpeedScale      float64        `json:"speedScale"`
-	PitchScale      float64        `json:"pitchScale"`
-	IntonationScale float64        `json:"intonationScale"`
+	AccentPhrases      []AccentPhrase `json:"accent_phrases"`
+	SpeedScale         float64        `json:"speedScale"`
+	PitchScale         float64        `json:"pitchScale"`
+	IntonationScale    float64        `json:"intonationScale"`
+	VolumeScale        float64        `json:"volumeScale"`
+	PrePhonemeLength   float64        `json:"prePhonemeLength"`
+	PostPhonemeLength  float64        `json:"postPhonemeLength"`
+	OutputSamplingRate int            `json:"outputSamplingRate"`
+	OutputStereo       bool           `json:"outputStereo"`
 }
 
 type Mora struct {
-	Text      string  `json:"text,omitempty"`
-	Consonant string  `json:"consonant,omitempty"`
-	Vowel     string  `json:"vowel,omitempty"`
-	Pitch     float64 `json:"pitch"`
+	Text            string  `json:"text,omitempty"`
+	Consonant       string  `json:"consonant,omitempty"`
+	ConsonantLength float64 `json:"consonant_length,omitempty"`
+	Vowel           string  `json:"vowel,omitempty"`
+	VowelLength     float64 `json:"vowel_length,omitempty"`
+	Pitch           float64 `json:"pitch"`
 }
 
 type AccentPhrase struct {
