@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bwmarrin/dgvoice"
+	"github.com/omatztw/dgvoice"
 )
 
 const ()
@@ -50,7 +50,8 @@ func (v *VoiceInstance) PlayQueue(speech Speech) {
 
 			err := v.Talk(v.nowTalking)
 			if err != nil {
-				v.Stop(false)
+				// Do nothing here for now...
+				// v.Stop()
 			}
 
 			v.QueueRemoveFisrt()
@@ -88,13 +89,13 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 	case <-c1:
 		return nil
 	case <-time.After(30 * time.Second):
-		v.Stop(true)
+		v.Stop()
 		return nil
 	}
 }
 
-func (v *VoiceInstance) Stop(force bool) {
-	if v.speaking || force {
+func (v *VoiceInstance) Stop() {
+	if v.speaking {
 		v.stop <- true
 	}
 }

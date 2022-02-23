@@ -4,11 +4,11 @@ go 1.12
 
 require (
 	github.com/boltdb/bolt v1.3.1
-	github.com/bwmarrin/dgvoice v0.0.0-20210225172318-caaac756e02e
 	github.com/bwmarrin/discordgo v0.23.2
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
+	github.com/omatztw/dgvoice v0.0.0-20220223040726-10123a305b2e
 	github.com/pelletier/go-toml v1.9.0 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
