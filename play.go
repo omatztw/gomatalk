@@ -30,13 +30,10 @@ func (v *VoiceInstance) PlayQueue(speech Speech) {
 		return
 	}
 	go func() {
-		// v.voiceMutex.Lock()
-		// defer v.voiceMutex.Unlock()
+		// 同一チャンネルで同時に読み上げるのを防ぐ。別のサーバーには影響しないようにしたい。
+		v.voiceMutex.Lock()
+		defer v.voiceMutex.Unlock()
 
-		// 複数チャンネルで同時に音声接続するとノイズが発生するため、globalのlockをかける
-		// この実装の場合、多くのチャンネルが同時に接続した場合に遅延が発生するのでできればチャネル毎のlockにしたいが。。
-		globalMutex.Lock()
-		defer globalMutex.Unlock()
 		for {
 			if len(v.queue) == 0 {
 				return
@@ -48,11 +45,7 @@ func (v *VoiceInstance) PlayQueue(speech Speech) {
 			}()
 			// v.voice.Speaking(true)
 
-			err := v.Talk(v.nowTalking)
-			if err != nil {
-				// Do nothing here for now...
-				// v.Stop()
-			}
+			v.Talk(v.nowTalking)
 
 			v.QueueRemoveFisrt()
 			// v.voice.Speaking(false)
