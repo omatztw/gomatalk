@@ -1,4 +1,4 @@
-package main
+package voice
 
 import (
 	"fmt"
@@ -6,13 +6,16 @@ import (
 	"os"
 	"os/exec"
 	"time"
+
+	"github.com/omatztw/gomatalk/pkg/config"
+	"github.com/omatztw/gomatalk/pkg/util"
 )
 
 func CreateAquestalkWav(speech Speech) (string, error) {
 	wavFileName := fmt.Sprintf("/tmp/voice-%d.wav", time.Now().UnixNano())
 	textFileName := fmt.Sprintf("/tmp/voice-%d.txt", time.Now().UnixNano())
 
-	write(textFileName, speech.Text)
+	util.Write(textFileName, speech.Text)
 
 	defer os.Remove(textFileName)
 
@@ -23,7 +26,7 @@ func CreateAquestalkWav(speech Speech) (string, error) {
 		"-g", fmt.Sprintf("%g", (speech.UserInfo.Volume+20)*2.5),
 	}
 
-	run := exec.Command(aq.ExePath, cmd...)
+	run := exec.Command(config.Aq.ExePath, cmd...)
 
 	err := run.Run()
 	if err != nil {

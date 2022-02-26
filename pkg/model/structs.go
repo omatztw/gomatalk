@@ -1,10 +1,4 @@
-package main
-
-import (
-	"sync"
-
-	"github.com/bwmarrin/discordgo"
-)
+package model
 
 // Options gomatalk option
 type Options struct {
@@ -28,34 +22,8 @@ type UserInfo struct {
 	Volume    float64
 }
 
-type Speech struct {
-	Text     string
-	UserInfo UserInfo
-	WavFile  string
-}
-
-type SpeechSignal struct {
-	data Speech
-	v    *VoiceInstance
-}
-
-type VoiceInstance struct {
-	sync.Mutex
-	voice      *discordgo.VoiceConnection
-	session    *discordgo.Session
-	queueMutex sync.Mutex
-	voiceMutex sync.Mutex
-	nowTalking Speech
-	queue      []Speech
-	recv       []int16
-	guildID    string
-	channelID  string
-	speaking   bool
-	stop       chan bool
-}
-
 type VoiceRoidConfig struct {
-	baseURL string
+	BaseURL string
 	Voice   []VoiceRoid
 }
 
@@ -64,7 +32,7 @@ type VoiceRoid struct {
 }
 
 type VoicevoxConfig struct {
-	baseURL string
+	BaseURL string
 	Voice   []VoiceVox
 }
 

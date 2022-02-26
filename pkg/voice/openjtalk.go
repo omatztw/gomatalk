@@ -1,4 +1,4 @@
-package main
+package voice
 
 import (
 	"fmt"
@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"time"
+
+	"github.com/omatztw/gomatalk/pkg/config"
 )
 
 const (
@@ -47,7 +49,7 @@ func Voices() map[string]string {
 
 func AquestalkList() map[string]string {
 	list := map[string]string{}
-	for _, v := range aq.Voice {
+	for _, v := range config.Aq.Voice {
 		list[v.Name] = v.Name
 	}
 	return list
@@ -55,7 +57,7 @@ func AquestalkList() map[string]string {
 
 func VoiceRoidList() map[string]string {
 	list := map[string]string{}
-	for _, v := range vo.Voice {
+	for _, v := range config.Vo.Voice {
 		list[v.Name] = v.Name
 	}
 	return list
@@ -63,14 +65,14 @@ func VoiceRoidList() map[string]string {
 
 func VoicevoxList() map[string]string {
 	list := map[string]string{}
-	for _, v := range vv.Voice {
+	for _, v := range config.Vv.Voice {
 		list[v.Name] = v.Name
 	}
 	return list
 }
 
-func isVoiceRoid(name string) bool {
-	for _, v := range vo.Voice {
+func IsVoiceRoid(name string) bool {
+	for _, v := range config.Vo.Voice {
 		if v.Name == name {
 			return true
 		}
@@ -78,8 +80,8 @@ func isVoiceRoid(name string) bool {
 	return false
 }
 
-func isVoiceVox(name string) bool {
-	for _, v := range vv.Voice {
+func IsVoiceVox(name string) bool {
+	for _, v := range config.Vv.Voice {
 		if v.Name == name {
 			return true
 		}
@@ -87,8 +89,8 @@ func isVoiceVox(name string) bool {
 	return false
 }
 
-func isAquesTalk(name string) bool {
-	for _, v := range aq.Voice {
+func IsAquesTalk(name string) bool {
+	for _, v := range config.Aq.Voice {
 		if v.Name == name {
 			return true
 		}
@@ -121,42 +123,6 @@ func merge(m1, m2 map[string]string) map[string]string {
 		ans[k] = v
 	}
 	return (ans)
-}
-
-func WavGC() {
-	go func() {
-		t := time.NewTicker(30 * time.Minute) // 30分おきに検索
-		defer t.Stop()
-		for {
-			select {
-			case <-t.C:
-				files, err := walkMatch("/tmp/voice-*.wav")
-				if err != nil {
-					log.Println("FATA: Error WavGC():", err)
-					return
-				}
-				for _, file := range files {
-					info, err := os.Stat(file)
-					if err != nil {
-						log.Println("FATA: Error WavGC():", err)
-						return
-					}
-					if info.ModTime().Before(time.Now().Add(-time.Minute * 10)) { // 10分前以前に作られたファイルは消去
-						log.Println("Garbage WAV found. Deleting...: " + file)
-						os.Remove(file)
-					}
-				}
-			}
-		}
-	}()
-}
-
-func walkMatch(pattern string) ([]string, error) {
-	files, err := filepath.Glob(pattern)
-	if err != nil {
-		return nil, err
-	}
-	return files, nil
 }
 
 func CreateWav(speech Speech) (string, error) {

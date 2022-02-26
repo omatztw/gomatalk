@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"encoding/json"
@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
+	"github.com/omatztw/gomatalk/pkg/model"
+	"github.com/omatztw/gomatalk/pkg/voice"
 )
 
 const (
@@ -215,7 +217,7 @@ func PutReplaceWord(guildID, pre, post string) error {
 }
 
 // PutDB ignore o unignore a test channel
-func PutUser(userID string, user UserInfo) error {
+func PutUser(userID string, user model.UserInfo) error {
 	db, err := bolt.Open(dbFileName, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return err
@@ -234,9 +236,9 @@ func PutUser(userID string, user UserInfo) error {
 }
 
 // GetDB read if a text channel is ignored
-func GetUserInfo(userID string) (UserInfo, error) {
+func GetUserInfo(userID string) (model.UserInfo, error) {
 	var v []byte
-	var user UserInfo
+	var user model.UserInfo
 	db, err := bolt.Open(dbFileName, 0600, &bolt.Options{ReadOnly: true})
 	if err != nil {
 		return user, err
@@ -263,20 +265,15 @@ func random(min, max float32) float64 {
 	return float64(rand.Float32()*(max-min) + min)
 }
 
-func randomInt(min, max int) int {
-	rand.Seed(time.Now().UnixNano())
-	return rand.Intn(max-min) + min
-}
-
-func MakeRandom() UserInfo {
+func MakeRandom() model.UserInfo {
 
 	rand.Seed(time.Now().UnixNano())
-	num := rand.Intn(len(Voices()))
+	num := rand.Intn(len(voice.Voices()))
 
-	user := UserInfo{}
-	user.Voice = VoiceList()[num]
+	user := model.UserInfo{}
+	user.Voice = voice.VoiceList()[num]
 	user.Speed = random(0.5, 2)
-	if isVoiceRoid(user.Voice) {
+	if voice.IsVoiceRoid(user.Voice) {
 		user.Tone = random(0.5, 2)
 		user.Intone = random(0, 2)
 	} else {
@@ -290,7 +287,7 @@ func MakeRandom() UserInfo {
 	return user
 }
 
-func InitUser(userID string) (UserInfo, error) {
+func InitUser(userID string) (model.UserInfo, error) {
 
 	user := MakeRandom()
 

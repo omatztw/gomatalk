@@ -3,48 +3,91 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/omatztw/gomatalk/pkg/config"
+	"github.com/omatztw/gomatalk/pkg/db"
+	"github.com/omatztw/gomatalk/pkg/discord"
 )
+
+func WavGC() {
+	go func() {
+		t := time.NewTicker(30 * time.Minute) // 30分おきに検索
+		defer t.Stop()
+		for {
+			select {
+			case <-t.C:
+				files, err := walkMatch("/tmp/voice-*.wav")
+				if err != nil {
+					log.Println("FATA: Error WavGC():", err)
+					return
+				}
+				for _, file := range files {
+					info, err := os.Stat(file)
+					if err != nil {
+						log.Println("FATA: Error WavGC():", err)
+						return
+					}
+					if info.ModTime().Before(time.Now().Add(-time.Minute * 10)) { // 10分前以前に作られたファイルは消去
+						log.Println("Garbage WAV found. Deleting...: " + file)
+						os.Remove(file)
+					}
+				}
+			}
+		}
+	}()
+}
+
+func walkMatch(pattern string) ([]string, error) {
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		return nil, err
+	}
+	return files, nil
+}
 
 func main() {
 	// runtime.GOMAXPROCS(1)
 	filename := flag.String("f", "bot.toml", "Set path for the config file.")
 	flag.Parse()
 	log.Println("INFO: Opening", *filename)
-	err := LoadConfig(*filename)
+	err := config.LoadConfig(*filename)
 	if err != nil {
 		log.Println("FATA:", err)
 		return
 	}
 
-	err = LoadVoiceConfig(*filename)
+	err = config.LoadVoiceConfig(*filename)
 	if err != nil {
 		log.Println("FATA:", err)
 		return
 	}
 
-	err = LoadVoiceVoxConfig(*filename)
+	err = config.LoadVoiceVoxConfig(*filename)
 	if err != nil {
 		log.Println("FATA:", err)
 		return
 	}
 
-	err = LoadAquestalkConfig(*filename)
+	err = config.LoadAquestalkConfig(*filename)
 	if err != nil {
 		log.Println("FATA:", err)
 		return
 	}
 
 	// Hot reload
-	Watch()
+	config.Watch()
 
-	err = CreateDB()
+	err = db.CreateDB()
 	if err != nil {
 		log.Println("FATA: DB", err)
 		return
 	}
 
 	// Connecto to Discord
-	err = DiscordConnect()
+	err = discord.DiscordConnect()
 	if err != nil {
 		log.Println("FATA: Discord", err)
 		return

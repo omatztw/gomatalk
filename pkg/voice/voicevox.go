@@ -1,4 +1,4 @@
-package main
+package voice
 
 import (
 	"bytes"
@@ -11,16 +11,19 @@ import (
 	"net/url"
 	"os"
 	"time"
+
+	"github.com/omatztw/gomatalk/pkg/config"
+	"github.com/omatztw/gomatalk/pkg/model"
 )
 
-func GenerateAudioQuery(speech Speech) (AudioQuery, error) {
+func GenerateAudioQuery(speech Speech) (model.AudioQuery, error) {
 	client := http.Client{
 		Timeout: 10 * time.Second,
 	}
 
-	url := fmt.Sprintf("%s/audio_query?text=%s&speaker=%d", vv.baseURL, url.QueryEscape(speech.Text), getIdByName(speech.UserInfo.Voice))
+	url := fmt.Sprintf("%s/audio_query?text=%s&speaker=%d", config.Vv.BaseURL, url.QueryEscape(speech.Text), getIdByName(speech.UserInfo.Voice))
 
-	audioQuery := AudioQuery{}
+	audioQuery := model.AudioQuery{}
 
 	req, err := http.NewRequest(
 		"POST",
@@ -58,7 +61,7 @@ func GenerateAudioQuery(speech Speech) (AudioQuery, error) {
 }
 
 func getIdByName(name string) int {
-	for _, v := range vv.Voice {
+	for _, v := range config.Vv.Voice {
 		if v.Name == name {
 			return v.Id
 		}
@@ -73,7 +76,7 @@ func CreateVoiceVoxWav(speech Speech) (string, error) {
 		Timeout: 10 * time.Second,
 	}
 
-	url := fmt.Sprintf("%s/synthesis?speaker=%d", vv.baseURL, getIdByName(speech.UserInfo.Voice))
+	url := fmt.Sprintf("%s/synthesis?speaker=%d", config.Vv.BaseURL, getIdByName(speech.UserInfo.Voice))
 
 	audioQuery, err := GenerateAudioQuery(speech)
 
