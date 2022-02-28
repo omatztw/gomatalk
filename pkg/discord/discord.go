@@ -249,7 +249,7 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		return
 	}
-	if v != nil {
+	if v != nil && v.Voice != nil {
 		if !isSpecial && v.ChannelID != m.ChannelID {
 			return
 		}

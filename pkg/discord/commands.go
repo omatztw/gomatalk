@@ -60,20 +60,23 @@ func JoinReporter(v *voice.VoiceInstance, m *discordgo.MessageCreate, s *discord
 	}
 	already := false
 	if v != nil {
-		log.Println("INFO: Creating bran new voice instance.")
-		already = true
-	} // else {
-	guildID := SearchGuild(m.ChannelID)
-	// create new voice instance
-	global.Mutex.Lock()
-	v = new(voice.VoiceInstance)
-	global.VoiceInstances[guildID] = v
-	v.GuildID = guildID
-	v.Session = s
-	v.Stop = make(chan bool, 1)
-	global.Mutex.Unlock()
-	//v.InitVoice()
-	// }
+		log.Println("INFO: A voice instance is already created.")
+		if v.ChannelID == m.ChannelID {
+			already = true
+		}
+	} else {
+		log.Println("INFO: New Voice Instance created")
+		guildID := SearchGuild(m.ChannelID)
+		// create new voice instance
+		global.Mutex.Lock()
+		v = new(voice.VoiceInstance)
+		global.VoiceInstances[guildID] = v
+		v.GuildID = guildID
+		v.Session = s
+		v.Stop = make(chan bool, 1)
+		global.Mutex.Unlock()
+		//v.InitVoice()
+	}
 	var err error
 	v.ChannelID = m.ChannelID
 	v.Voice, err = Dg.ChannelVoiceJoin(v.GuildID, voiceChannelID, false, false)
@@ -86,7 +89,7 @@ func JoinReporter(v *voice.VoiceInstance, m *discordgo.MessageCreate, s *discord
 		v.Voice.LogLevel = discordgo.LogDebug
 	}
 	// v.Voice.Speaking(false)
-	log.Println("INFO: New Voice Instance created")
+
 	botUser, _ := Dg.User("@me")
 	channel, err := Dg.Channel(m.ChannelID)
 	if err == nil {
