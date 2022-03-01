@@ -1,5 +1,6 @@
 gomatalk
 data/*.db
+data/*.db.migrated
 *.toml
 .vscode/
 wav/*.wav

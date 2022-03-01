@@ -128,7 +128,7 @@ func closeConnection(v *voice.VoiceInstance) {
 }
 
 func ListBotReporter(m *discordgo.MessageCreate) {
-	botList, err := db.ListBots(m.GuildID)
+	botList, err := global.DB.ListBots(m.GuildID)
 	if err != nil {
 		return
 	}
@@ -176,7 +176,7 @@ func AddBotReporter(m *discordgo.MessageCreate) {
 	if len(commands) > 2 {
 		wavList = strings.Split(commands[2], ",")
 	}
-	err = db.Addbot(m.GuildID, commands[1], wavList)
+	err = global.DB.AddBot(m.GuildID, commands[1], wavList)
 	if err != nil {
 		ChMessageSend(m.ChannelID, fmt.Sprintf("BOT「%s」の登録に失敗しました。", username))
 		return
@@ -191,7 +191,7 @@ func DeleteBotReporter(m *discordgo.MessageCreate) {
 		HelpReporter(m)
 		return
 	}
-	err := db.DeleteBot(m.GuildID, commands[1])
+	err := global.DB.DeleteBot(m.GuildID, commands[1])
 	if err != nil {
 		ChMessageSend(m.ChannelID, fmt.Sprintf("BOT ID「%s」の削除に失敗しました", commands[1]))
 		return
@@ -200,7 +200,8 @@ func DeleteBotReporter(m *discordgo.MessageCreate) {
 }
 
 func ListWordsReporter(m *discordgo.MessageCreate) {
-	wordsList, err := db.ListWords(m.GuildID)
+	wordsList, err := global.DB.ListWords(m.GuildID)
+
 	if err != nil {
 		return
 	}
@@ -221,7 +222,7 @@ func AddWordReporter(m *discordgo.MessageCreate) {
 		HelpReporter(m)
 		return
 	}
-	err := db.AddWord(m.GuildID, commands[1], commands[2])
+	err := global.DB.AddWord(m.GuildID, commands[1], commands[2])
 	if err != nil {
 		ChMessageSend(m.ChannelID, fmt.Sprintf("単語「%s」の登録に失敗しました", commands[1]))
 		return
@@ -236,7 +237,7 @@ func DeleteWordReporter(m *discordgo.MessageCreate) {
 		HelpReporter(m)
 		return
 	}
-	err := db.DeleteWord(m.GuildID, commands[1])
+	err := global.DB.DeleteWord(m.GuildID, commands[1])
 	if err != nil {
 		ChMessageSend(m.ChannelID, fmt.Sprintf("単語「%s」の削除に失敗しました", commands[1]))
 		return
@@ -277,7 +278,8 @@ func statusReporterInternal(userID string, m *discordgo.MessageCreate) {
 		}
 		user = webHook.User
 	}
-	userInfo, err := db.GetUserInfo(userID)
+	DBUser, err := global.DB.GetUser(userID)
+	userInfo := DBUser.UserInfo
 	if err != nil {
 		log.Println("ERROR: Cannot get user information.")
 		return
@@ -322,7 +324,7 @@ func MakeRandomHandler(m *discordgo.MessageCreate) {
 
 func makeRandomHandlerInternal(userID string, m *discordgo.MessageCreate) {
 	user := db.MakeRandom()
-	db.PutUser(userID, user)
+	global.DB.AddUser(userID, user)
 	statusReporterInternal(userID, m)
 }
 
@@ -373,7 +375,7 @@ func setStatusHandlerInternal(userID string, userInfo model.UserInfo, m *discord
 		HelpReporter(m)
 		return
 	}
-	db.PutUser(userID, userInfo)
+	global.DB.AddUser(userID, userInfo)
 	statusReporterInternal(userID, m)
 
 }
@@ -489,16 +491,16 @@ func SpeechText(v *voice.VoiceInstance, m *discordgo.MessageCreate) {
 
 	play.ReplaceWords(v.GuildID, &content)
 
-	user, err := db.GetUserInfo(m.Author.ID)
+	user, err := global.DB.GetUser(m.Author.ID)
 	if err != nil {
 		log.Println("INFO: Cannot Get User info")
-		user, err = db.InitUser(m.Author.ID)
+		user, err = global.DB.NewUser(m.Author.ID)
 		if err != nil {
 			log.Println("ERR: Cannot initialize User")
 			return
 		}
 	}
-	botList, _ := db.ListBots(v.GuildID)
+	botList, _ := global.DB.ListBots(v.GuildID)
 	wavFileName := ""
 	for k, v := range botList {
 		if k == m.Author.ID {
@@ -508,7 +510,7 @@ func SpeechText(v *voice.VoiceInstance, m *discordgo.MessageCreate) {
 			}
 		}
 	}
-	speech := voice.Speech{content, user, wavFileName}
+	speech := voice.Speech{content, user.UserInfo, wavFileName}
 	speechSig := voice.SpeechSignal{speech, v}
 	go func() {
 		global.SpeechSignal <- speechSig

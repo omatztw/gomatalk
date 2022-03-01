@@ -7,7 +7,6 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/omatztw/gomatalk/pkg/config"
-	"github.com/omatztw/gomatalk/pkg/db"
 	global "github.com/omatztw/gomatalk/pkg/global_vars"
 	"github.com/omatztw/gomatalk/pkg/play"
 	"github.com/omatztw/gomatalk/pkg/voice"
@@ -139,7 +138,7 @@ func ConnectHandler(s *discordgo.Session, connect *discordgo.Connect) {
 // GuildCreateHandler
 func GuildCreateHandler(s *discordgo.Session, guild *discordgo.GuildCreate) {
 	log.Println("INFO: Guild Create:", guild.ID)
-	err := db.CreateGuildDB(guild.ID)
+	err := global.DB.CreateGuild(guild.ID)
 	if err != nil {
 		log.Println("FATA: DB", err)
 		return
@@ -194,7 +193,7 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 // MessageCreateHandler
 func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	guildID := SearchGuild(m.ChannelID)
-	botList, _ := db.ListBots(guildID)
+	botList, _ := global.DB.ListBots(guildID)
 	isSpecial := false
 	if m.Author.Bot {
 		if _, ok := botList[m.Author.ID]; !ok {
