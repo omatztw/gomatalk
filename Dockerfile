@@ -46,6 +46,7 @@ RUN mkdir wav
 VOLUME /workspace/wav
 RUN mkdir voices
 VOLUME /workspace/voices
-COPY migrates  /workspace/.
+RUN mkdir migrates
+COPY migrates  /workspace/migrates/.
 
 CMD ["/workspace/gomatalk", "-f", "/workspace/config/config.toml"]
