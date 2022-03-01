@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/omatztw/gomatalk/pkg/db"
+	global "github.com/omatztw/gomatalk/pkg/global_vars"
 	"github.com/omatztw/gomatalk/pkg/voice"
 )
 
@@ -28,7 +28,7 @@ func Exists(filename string) bool {
 }
 
 func ReplaceWords(guildID string, text *string) error {
-	wordList, err := db.ListWords(guildID)
+	wordList, err := global.DB.ListWords(guildID)
 	if err != nil {
 		log.Println("ERR: Cannot get word list.")
 		return err

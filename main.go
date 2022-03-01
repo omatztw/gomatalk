@@ -7,9 +7,11 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/omatztw/gomatalk/pkg/boltdb"
 	"github.com/omatztw/gomatalk/pkg/config"
 	"github.com/omatztw/gomatalk/pkg/db"
 	"github.com/omatztw/gomatalk/pkg/discord"
+	global "github.com/omatztw/gomatalk/pkg/global_vars"
 )
 
 func WavGC() {
@@ -80,11 +82,7 @@ func main() {
 	// Hot reload
 	config.Watch()
 
-	err = db.CreateDB()
-	if err != nil {
-		log.Println("FATA: DB", err)
-		return
-	}
+	global.DB = db.NewDatabase("data/gomatalk-sqlite.db")
 
 	// Connecto to Discord
 	err = discord.DiscordConnect()
@@ -92,7 +90,7 @@ func main() {
 		log.Println("FATA: Discord", err)
 		return
 	}
-
+	boltdb.Migrate()
 	WavGC()
 
 	<-make(chan struct{})
