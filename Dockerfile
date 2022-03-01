@@ -1,4 +1,4 @@
-FROM golang:1.15.6-buster as builder
+FROM golang:1.17.7-buster as builder
 
 RUN mkdir -p /workspace
 WORKDIR /workspace
