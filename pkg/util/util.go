@@ -10,7 +10,7 @@ import (
 func Write(filename, content string) error {
 	file, err := os.Create(filename)
 	if err != nil {
-		log.Fatal(err) //ファイルが開けなかったときエラー出力
+		log.Println("FATA: ", err) //ファイルが開けなかったときエラー出力
 		return err
 	}
 	defer file.Close()

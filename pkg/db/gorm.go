@@ -25,18 +25,25 @@ func NewDatabase(dbName string) *Database {
 	conn := &Database{
 		DBName: dbName,
 	}
-	conn.Connect()
-	// conn.DB.AutoMigrate(&User{}, &Bot{}, &Word{}, &Guild{})
-	conn.Migrate()
-	return conn
-}
-
-func (c *Database) Connect() {
-	var err error
-	c.DB, err = gorm.Open(sqlite.Open(c.DBName), &gorm.Config{})
+	err := conn.Connect()
 	if err != nil {
 		panic("Cannot connect to DB")
 	}
+	// conn.DB.AutoMigrate(&User{}, &Bot{}, &Word{}, &Guild{})
+	err = conn.Migrate()
+	if err != nil {
+		panic("Cannot migrate DB")
+	}
+	return conn
+}
+
+func (c *Database) Connect() error {
+	var err error
+	c.DB, err = gorm.Open(sqlite.Open(c.DBName), &gorm.Config{})
+	if err != nil {
+		log.Println("FATA: ", err)
+	}
+	return err
 }
 
 func (c *Database) AddUser(userID string, userInfo model.UserInfo) error {
@@ -141,12 +148,12 @@ func (c *Database) ListGuilds() ([]Guild, error) {
 func (c *Database) Migrate() error {
 	sqlDb, err := c.DB.DB()
 	if err != nil {
-		log.Fatal(err)
+		log.Println("FATA: ", err)
 		return err
 	}
 	driver, err := sqlite3.WithInstance(sqlDb, &sqlite3.Config{})
 	if err != nil {
-		log.Fatal(err)
+		log.Println("FATA: ", err)
 		return err
 	}
 	m, err := migrate.NewWithDatabaseInstance(
