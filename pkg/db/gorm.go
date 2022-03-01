@@ -164,7 +164,15 @@ func (c *Database) Migrate() error {
 		return err
 	}
 	err = m.Up()
-	return err
+	if err != nil {
+		if err == migrate.ErrNoChange {
+			// OK for NoChange
+			return nil
+		}
+		log.Println("FATA: ", err)
+		return err
+	}
+	return nil
 
 }
 
