@@ -1,5 +1,7 @@
 # GOMATALK
 
+[![buildx](https://github.com/omatztw/gomatalk/actions/workflows/buildx.yaml/badge.svg)](https://github.com/omatztw/gomatalk/actions/workflows/buildx.yaml)
+
 Discordのチャットを読み上げるボット。  
 https://github.com/omatztw/omatalk をGoでリメイク
 
