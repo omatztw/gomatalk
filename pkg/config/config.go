@@ -25,6 +25,9 @@ func Watch() {
 func Reload(e fsnotify.Event) {
 	log.Println("INFO: The config file changed:", e.Name)
 	LoadConfig(e.Name)
+	LoadVoiceConfig(e.Name)
+	LoadVoiceVoxConfig(e.Name)
+	LoadAquestalkConfig(e.Name)
 	//StopStream()
 }
 
@@ -38,23 +41,24 @@ func LoadConfig(filename string) (err error) {
 		log.Println("HOGE")
 		return err
 	}
-	if O.DiscordToken = viper.GetString("discord.token"); O.DiscordToken == "" {
+	err = viper.Unmarshal(&O)
+	if err != nil {
+		return errors.New("cannot load config")
+	}
+	if O.Discord.Token == "" {
 		return errors.New("'token' must be present in config file")
 	}
-	if O.DiscordStatus = viper.GetString("discord.status"); O.DiscordStatus == "" {
+	if O.Discord.Status == "" {
 		return errors.New("'status' must be present in config file")
 	}
-	if O.DiscordPrefix = viper.GetString("discord.prefix"); O.DiscordPrefix == "" {
+	if O.Discord.Prefix == "" {
 		return errors.New("'prefix' must be present in config file")
 	}
-	O.DiscordNumShard = viper.GetInt("discord.shardCount")
-	O.DiscordShardID = viper.GetInt("discord.shardID")
-	O.Debug = viper.GetBool("discord.debug")
-	O.Secret = viper.GetString("discord.secret")
 	return nil
 }
 
 func LoadVoiceConfig(filename string) (err error) {
+	Vo = &model.VoiceRoidConfig{}
 	viper.SetConfigType("toml")
 	viper.SetConfigFile(filename)
 
@@ -62,14 +66,15 @@ func LoadVoiceConfig(filename string) (err error) {
 	if err != nil {
 		return err
 	}
-	Vo.BaseURL = viper.GetString("voiceroid.baseURL")
-	var voiceRoid []model.VoiceRoid
-	viper.UnmarshalKey("voiceroid.voice", &voiceRoid)
-	Vo.Voice = voiceRoid
+	err = viper.Unmarshal(&Vo)
+	if err != nil {
+		return errors.New("cannot load config")
+	}
 	return nil
 }
 
 func LoadVoiceVoxConfig(filename string) (err error) {
+	Vv = &model.VoicevoxConfig{}
 	viper.SetConfigType("toml")
 	viper.SetConfigFile(filename)
 
@@ -77,14 +82,15 @@ func LoadVoiceVoxConfig(filename string) (err error) {
 	if err != nil {
 		return err
 	}
-	Vv.BaseURL = viper.GetString("voicevox.baseURL")
-	var voiceVox []model.VoiceVox
-	viper.UnmarshalKey("voicevox.voice", &voiceVox)
-	Vv.Voice = voiceVox
+	err = viper.Unmarshal(&Vv)
+	if err != nil {
+		return errors.New("cannot load config")
+	}
 	return nil
 }
 
 func LoadAquestalkConfig(filename string) (err error) {
+	Aq = &model.AquestalkConfig{}
 	viper.SetConfigType("toml")
 	viper.SetConfigFile(filename)
 
@@ -92,9 +98,9 @@ func LoadAquestalkConfig(filename string) (err error) {
 	if err != nil {
 		return err
 	}
-	Aq.ExePath = viper.GetString("aquestalk.exePath")
-	var aquestalk []model.Aquestalk
-	viper.UnmarshalKey("aquestalk.voice", &aquestalk)
-	Aq.Voice = aquestalk
+	err = viper.Unmarshal(&Aq)
+	if err != nil {
+		return errors.New("cannot load config")
+	}
 	return nil
 }

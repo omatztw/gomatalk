@@ -19,7 +19,7 @@ func CreateVoiceroidWav(speech Speech) (string, error) {
 	}
 
 	response, err := client.Get(fmt.Sprintf("%s/api/v1/audiofile?text=%s&name=%s&speed=%f&pitch=%f&range=%f",
-		config.Vo.BaseURL,
+		config.Vo.Voiceroid.BaseURL,
 		url.QueryEscape(speech.Text),
 		url.QueryEscape(speech.UserInfo.Voice),
 		speech.UserInfo.Speed,

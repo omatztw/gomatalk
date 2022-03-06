@@ -18,7 +18,7 @@ var (
 
 // DiscordConnect make a new connection to Discord
 func DiscordConnect() (err error) {
-	Dg, err = discordgo.New("Bot " + config.O.DiscordToken)
+	Dg, err = discordgo.New("Bot " + config.O.Discord.Token)
 	if err != nil {
 		log.Println("FATA: error creating Discord session,", err)
 		return
@@ -29,12 +29,12 @@ func DiscordConnect() (err error) {
 	// dg.AddHandler(GuildDeleteHandler)
 	Dg.AddHandler(VoiceStatusUpdateHandler)
 	Dg.AddHandler(ConnectHandler)
-	if config.O.DiscordNumShard > 1 {
-		Dg.ShardCount = config.O.DiscordNumShard
-		Dg.ShardID = config.O.DiscordShardID
+	if config.O.Discord.NumShard > 1 {
+		Dg.ShardCount = config.O.Discord.NumShard
+		Dg.ShardID = config.O.Discord.ShardID
 	}
 
-	if config.O.Debug {
+	if config.O.Discord.Debug {
 		Dg.LogLevel = discordgo.LogDebug
 	}
 	// Open Websocket
@@ -51,7 +51,7 @@ func DiscordConnect() (err error) {
 	} // Login successful
 	log.Println("INFO: Bot is now running. Press CTRL-C to exit.")
 	initRoutine()
-	Dg.UpdateGameStatus(0, config.O.DiscordStatus)
+	Dg.UpdateGameStatus(0, config.O.Discord.Status)
 	return nil
 }
 
@@ -132,7 +132,7 @@ func initRoutine() {
 
 // ConnectHandler
 func ConnectHandler(s *discordgo.Session, connect *discordgo.Connect) {
-	s.UpdateGameStatus(0, config.O.DiscordStatus)
+	s.UpdateGameStatus(0, config.O.Discord.Status)
 }
 
 // GuildCreateHandler
@@ -185,7 +185,7 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 			delete(global.VoiceInstances, v.GuildID)
 			global.Mutex.Unlock()
 			updateNickName(v, "")
-			ChMessageSend(v.ChannelID, "すやぁ")
+			ChMessageSend(v.ChannelID, config.O.Greeting["nobody"])
 		}
 	}
 }
@@ -202,8 +202,8 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		isSpecial = true
 	}
 	v := global.VoiceInstances[guildID]
-	if strings.HasPrefix(m.Content, config.O.DiscordPrefix) {
-		content := strings.Replace(m.Content, config.O.DiscordPrefix, "", 1)
+	if strings.HasPrefix(m.Content, config.O.Discord.Prefix) {
+		content := strings.Replace(m.Content, config.O.Discord.Prefix, "", 1)
 		command := strings.Fields(content)
 
 		if len(command) == 0 {

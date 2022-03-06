@@ -23,18 +23,18 @@ import (
 func HelpReporter(m *discordgo.MessageCreate) {
 	log.Println("INFO:", m.Author.Username, "send 'help'")
 	help := "コマンド一覧\n" +
-		config.O.DiscordPrefix + "help or " + config.O.DiscordPrefix + "h  ->  コマンド一覧と簡単な説明を表示.\n" +
-		config.O.DiscordPrefix + "summon or " + config.O.DiscordPrefix + "s  ->  読み上げを開始.\n" +
-		config.O.DiscordPrefix + "bye or " + config.O.DiscordPrefix + "b  ->  読み上げを終了.\n" +
-		config.O.DiscordPrefix + "add_word or " + config.O.DiscordPrefix + "aw  ->  辞書登録. (" + config.O.DiscordPrefix + "aw 単語 読み" + ")\n" +
-		config.O.DiscordPrefix + "delete_word or " + config.O.DiscordPrefix + "dw  ->  辞書削除. (" + config.O.DiscordPrefix + "dw 単語" + ")\n" +
-		config.O.DiscordPrefix + "words_list or " + config.O.DiscordPrefix + "wl  ->  辞書一覧を表示.\n" +
-		config.O.DiscordPrefix + "add_bot or " + config.O.DiscordPrefix + "ab  ->  BOTを読み上げ対象に登録. (" + config.O.DiscordPrefix + "ab <BOT ID> <WAV LIST>" + ")\n" +
-		config.O.DiscordPrefix + "delete_bot or " + config.O.DiscordPrefix + "db  ->  BOTを読み上げ対象から削除. (" + config.O.DiscordPrefix + "db <BOT ID>" + ")\n" +
-		config.O.DiscordPrefix + "bots_list or " + config.O.DiscordPrefix + "bl  ->  読み上げ対象BOTの一覧を表示.\n" +
-		config.O.DiscordPrefix + "random or " + config.O.DiscordPrefix + "r  ->  自分の声をﾗﾝﾀﾞﾑで変更する.\n" +
-		config.O.DiscordPrefix + "status ->  現在の声の設定を表示.\n" +
-		config.O.DiscordPrefix + "update_voice or " + config.O.DiscordPrefix + "uv  ->  声の設定を変更. (" + config.O.DiscordPrefix + "uv voice speed tone intone threshold volume" + ")\n" +
+		config.O.Discord.Prefix + "help or " + config.O.Discord.Prefix + "h  ->  コマンド一覧と簡単な説明を表示.\n" +
+		config.O.Discord.Prefix + "summon or " + config.O.Discord.Prefix + "s  ->  読み上げを開始.\n" +
+		config.O.Discord.Prefix + "bye or " + config.O.Discord.Prefix + "b  ->  読み上げを終了.\n" +
+		config.O.Discord.Prefix + "add_word or " + config.O.Discord.Prefix + "aw  ->  辞書登録. (" + config.O.Discord.Prefix + "aw 単語 読み" + ")\n" +
+		config.O.Discord.Prefix + "delete_word or " + config.O.Discord.Prefix + "dw  ->  辞書削除. (" + config.O.Discord.Prefix + "dw 単語" + ")\n" +
+		config.O.Discord.Prefix + "words_list or " + config.O.Discord.Prefix + "wl  ->  辞書一覧を表示.\n" +
+		config.O.Discord.Prefix + "add_bot or " + config.O.Discord.Prefix + "ab  ->  BOTを読み上げ対象に登録. (" + config.O.Discord.Prefix + "ab <BOT ID> <WAV LIST>" + ")\n" +
+		config.O.Discord.Prefix + "delete_bot or " + config.O.Discord.Prefix + "db  ->  BOTを読み上げ対象から削除. (" + config.O.Discord.Prefix + "db <BOT ID>" + ")\n" +
+		config.O.Discord.Prefix + "bots_list or " + config.O.Discord.Prefix + "bl  ->  読み上げ対象BOTの一覧を表示.\n" +
+		config.O.Discord.Prefix + "random or " + config.O.Discord.Prefix + "r  ->  自分の声をﾗﾝﾀﾞﾑで変更する.\n" +
+		config.O.Discord.Prefix + "status ->  現在の声の設定を表示.\n" +
+		config.O.Discord.Prefix + "update_voice or " + config.O.Discord.Prefix + "uv  ->  声の設定を変更. (" + config.O.Discord.Prefix + "uv voice speed tone intone threshold volume" + ")\n" +
 		"   voice: 声の種類 - " + strings.Join(voice.VoiceList(), "\n                  - ") + "\n" +
 		"   speed: 話す速度 範囲(0.5~2.0) \n" +
 		"   tone : 声のトーン 範囲(-20~20) [VOICEROIDは 0.5 ~ 2] \n" +
@@ -42,7 +42,7 @@ func HelpReporter(m *discordgo.MessageCreate) {
 		"   threshold : ブツブツするときとか改善するかも?? 範囲(0.0~1.0)(初期値 0.5) \n" +
 		"   allpass : よくわからん 範囲(0 - 1.0) (0はauto)  \n" +
 		"   volume : 音量（dB） 範囲(-20~20)(初期値 1) \n" +
-		config.O.DiscordPrefix + "stop  ->  読み上げを一時停止."
+		config.O.Discord.Prefix + "stop  ->  読み上げを一時停止."
 	log.Println("", m.ChannelID)
 	ChFileSend(m.ChannelID, "help.txt", help)
 	// ChMessageSend(m.ChannelID, help)
@@ -55,7 +55,7 @@ func JoinReporter(v *voice.VoiceInstance, m *discordgo.MessageCreate, s *discord
 	voiceChannelID := SearchVoiceChannel(m.Author.ID)
 	if voiceChannelID == "" {
 		log.Println("ERROR: Voice channel id not found.")
-		ChMessageSend(m.ChannelID, "<@"+m.Author.ID+"> まずVCにはいろ( ˘ω˘ )")
+		ChMessageSend(m.ChannelID, "<@"+m.Author.ID+"> "+config.O.ErrorMsg["novc"])
 		return
 	}
 	already := false
@@ -85,7 +85,7 @@ func JoinReporter(v *voice.VoiceInstance, m *discordgo.MessageCreate, s *discord
 		log.Println("ERROR: Error to join in a voice channel: ", err)
 		return
 	}
-	if config.O.Debug {
+	if config.O.Discord.Debug {
 		v.Voice.LogLevel = discordgo.LogDebug
 	}
 	// v.Voice.Speaking(false)
@@ -97,7 +97,7 @@ func JoinReporter(v *voice.VoiceInstance, m *discordgo.MessageCreate, s *discord
 		updateNickName(v, nickname)
 	}
 	if !already {
-		ChMessageSend(v.ChannelID, "おあ")
+		ChMessageSend(v.ChannelID, config.O.Greeting["join"])
 	}
 }
 
@@ -113,7 +113,7 @@ func LeaveReporter(v *voice.VoiceInstance, m *discordgo.MessageCreate) {
 		return
 	}
 	closeConnection(v)
-	ChMessageSend(v.ChannelID, "おつぅ")
+	ChMessageSend(v.ChannelID, config.O.Greeting["leave"])
 }
 
 func closeConnection(v *voice.VoiceInstance) {
@@ -123,7 +123,7 @@ func closeConnection(v *voice.VoiceInstance) {
 	global.Mutex.Lock()
 	delete(global.VoiceInstances, v.GuildID)
 	global.Mutex.Unlock()
-	Dg.UpdateGameStatus(0, config.O.DiscordStatus)
+	Dg.UpdateGameStatus(0, config.O.Discord.Status)
 	updateNickName(v, "")
 }
 
@@ -292,7 +292,7 @@ func statusReporterInternal(userID string, m *discordgo.MessageCreate) {
 		userInfo.Threshold,
 		userInfo.AllPass,
 		userInfo.Volume,
-		config.O.DiscordPrefix,
+		config.O.Discord.Prefix,
 		userInfo.Voice,
 		userInfo.Speed,
 		userInfo.Tone,
@@ -312,7 +312,8 @@ func MakeRandomForOther(m *discordgo.MessageCreate) {
 	userID := commands[1]
 	user, _ := Dg.User(userID)
 	if !user.Bot {
-		ChMessageSend(m.ChannelID, "声変えられるのはBotだけ( ˘ω˘ )")
+		log.Println("aaa")
+		ChMessageSend(m.ChannelID, config.O.ErrorMsg["onlybot"])
 		return
 	}
 	makeRandomHandlerInternal(userID, m)
@@ -397,7 +398,7 @@ func SetStatusForOtherHandler(m *discordgo.MessageCreate) {
 		}
 	} else {
 		if !user.Bot {
-			ChMessageSend(m.ChannelID, "声変えられるのはBotだけ( ˘ω˘ )")
+			ChMessageSend(m.ChannelID, config.O.ErrorMsg["onlyBot"])
 			return
 		}
 	}
@@ -468,7 +469,7 @@ func RebootReporter(m *discordgo.MessageCreate) {
 		return
 	}
 	secret := commands[1]
-	if secret == config.O.Secret {
+	if secret == config.O.Discord.Secret {
 		panic("Rebooting")
 	}
 }

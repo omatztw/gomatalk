@@ -2,13 +2,17 @@ package model
 
 // Options gomatalk option
 type Options struct {
-	DiscordToken    string
-	DiscordStatus   string
-	DiscordPrefix   string
-	DiscordNumShard int
-	DiscordShardID  int
-	Debug           bool
-	Secret          string
+	Discord struct {
+		Token    string `mapstructure:"token"`
+		Status   string `mapstructure:"status"`
+		Prefix   string `mapstructure:"prefix"`
+		NumShard int    `mapstructure:"shardCount"`
+		ShardID  int    `mapstructure:"shardID"`
+		Debug    bool   `mapstructure:"debug"`
+		Secret   string `mapstructure:"secret"`
+	} `mapstructure:"discord"`
+	Greeting map[string]string `mapstructure:"greeting"`
+	ErrorMsg map[string]string `mapstructure:"errorMsg"`
 }
 
 // UserInfo user information for talk
@@ -23,8 +27,10 @@ type UserInfo struct {
 }
 
 type VoiceRoidConfig struct {
-	BaseURL string
-	Voice   []VoiceRoid
+	Voiceroid struct {
+		BaseURL string      `mapstructure:"baseURL"`
+		Voice   []VoiceRoid `mapstructure:"voice"`
+	} `mapstructure:"voiceroid"`
 }
 
 type VoiceRoid struct {
@@ -32,8 +38,10 @@ type VoiceRoid struct {
 }
 
 type VoicevoxConfig struct {
-	BaseURL string
-	Voice   []VoiceVox
+	Voicevox struct {
+		BaseURL string     `mapstructure:"baseURL"`
+		Voice   []VoiceVox `mapstructure:"voice"`
+	} `mapstructure:"voicevox"`
 }
 
 type VoiceVox struct {
@@ -68,8 +76,10 @@ type AccentPhrase struct {
 }
 
 type AquestalkConfig struct {
-	ExePath string
-	Voice   []Aquestalk
+	Aquestalk struct {
+		ExePath string      `mapstructure:"exePath"`
+		Voice   []Aquestalk `mapstructure:"voice"`
+	} `mapstructure:"aquestalk"`
 }
 
 type Aquestalk struct {

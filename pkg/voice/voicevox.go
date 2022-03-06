@@ -21,7 +21,7 @@ func GenerateAudioQuery(speech Speech) (model.AudioQuery, error) {
 		Timeout: 10 * time.Second,
 	}
 
-	url := fmt.Sprintf("%s/audio_query?text=%s&speaker=%d", config.Vv.BaseURL, url.QueryEscape(speech.Text), getIdByName(speech.UserInfo.Voice))
+	url := fmt.Sprintf("%s/audio_query?text=%s&speaker=%d", config.Vv.Voicevox.BaseURL, url.QueryEscape(speech.Text), getIdByName(speech.UserInfo.Voice))
 
 	audioQuery := model.AudioQuery{}
 
@@ -61,7 +61,7 @@ func GenerateAudioQuery(speech Speech) (model.AudioQuery, error) {
 }
 
 func getIdByName(name string) int {
-	for _, v := range config.Vv.Voice {
+	for _, v := range config.Vv.Voicevox.Voice {
 		if v.Name == name {
 			return v.Id
 		}
@@ -76,7 +76,7 @@ func CreateVoiceVoxWav(speech Speech) (string, error) {
 		Timeout: 10 * time.Second,
 	}
 
-	url := fmt.Sprintf("%s/synthesis?speaker=%d", config.Vv.BaseURL, getIdByName(speech.UserInfo.Voice))
+	url := fmt.Sprintf("%s/synthesis?speaker=%d", config.Vv.Voicevox.BaseURL, getIdByName(speech.UserInfo.Voice))
 
 	audioQuery, err := GenerateAudioQuery(speech)
 

@@ -5,3 +5,13 @@
   secret = "secret"
 #  shardCount = 3
 #  shardID = 0
+
+[greeting]
+join = "おあ"
+leave = "おつぅ"
+nobody = "すやぁ"
+
+[errorMsg]
+novc = "まずVCにはいろ( ˘ω˘ )"
+onlyBot = "声変えられるのはBotだけ( ˘ω˘ )"
+

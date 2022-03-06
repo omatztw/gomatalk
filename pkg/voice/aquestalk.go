@@ -26,7 +26,7 @@ func CreateAquestalkWav(speech Speech) (string, error) {
 		"-g", fmt.Sprintf("%g", (speech.UserInfo.Volume+20)*2.5),
 	}
 
-	run := exec.Command(config.Aq.ExePath, cmd...)
+	run := exec.Command(config.Aq.Aquestalk.ExePath, cmd...)
 
 	err := run.Run()
 	if err != nil {

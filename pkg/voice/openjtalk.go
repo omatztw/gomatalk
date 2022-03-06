@@ -49,7 +49,7 @@ func Voices() map[string]string {
 
 func AquestalkList() map[string]string {
 	list := map[string]string{}
-	for _, v := range config.Aq.Voice {
+	for _, v := range config.Aq.Aquestalk.Voice {
 		list[v.Name] = v.Name
 	}
 	return list
@@ -57,7 +57,7 @@ func AquestalkList() map[string]string {
 
 func VoiceRoidList() map[string]string {
 	list := map[string]string{}
-	for _, v := range config.Vo.Voice {
+	for _, v := range config.Vo.Voiceroid.Voice {
 		list[v.Name] = v.Name
 	}
 	return list
@@ -65,14 +65,14 @@ func VoiceRoidList() map[string]string {
 
 func VoicevoxList() map[string]string {
 	list := map[string]string{}
-	for _, v := range config.Vv.Voice {
+	for _, v := range config.Vv.Voicevox.Voice {
 		list[v.Name] = v.Name
 	}
 	return list
 }
 
 func IsVoiceRoid(name string) bool {
-	for _, v := range config.Vo.Voice {
+	for _, v := range config.Vo.Voiceroid.Voice {
 		if v.Name == name {
 			return true
 		}
@@ -81,7 +81,7 @@ func IsVoiceRoid(name string) bool {
 }
 
 func IsVoiceVox(name string) bool {
-	for _, v := range config.Vv.Voice {
+	for _, v := range config.Vv.Voicevox.Voice {
 		if v.Name == name {
 			return true
 		}
@@ -90,7 +90,7 @@ func IsVoiceVox(name string) bool {
 }
 
 func IsAquesTalk(name string) bool {
-	for _, v := range config.Aq.Voice {
+	for _, v := range config.Aq.Aquestalk.Voice {
 		if v.Name == name {
 			return true
 		}
