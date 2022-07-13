@@ -18,7 +18,7 @@ import (
 
 func GenerateAudioQuery(speech Speech) (model.AudioQuery, error) {
 	client := http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: 1 * time.Second,
 	}
 
 	url := fmt.Sprintf("%s/audio_query?text=%s&speaker=%d", config.Vv.Voicevox.BaseURL, url.QueryEscape(speech.Text), getIdByName(speech.UserInfo.Voice))

@@ -82,6 +82,23 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 		} else {
 			fileName, err = CreateWav(speech)
 		}
+		if err != nil {
+			// VOICEROIDやVOICEBOXが起動していない場合に通常音声で再生する
+			fallbackSpeech := Speech{
+				Text: speech.Text,
+				UserInfo: model.UserInfo{
+					Voice:     "normal",
+					Speed:     1.3,
+					Tone:      1,
+					Intone:    0,
+					Threshold: 0.5,
+					AllPass:   0,
+					Volume:    1,
+				},
+				WavFile: speech.WavFile,
+			}
+			fileName, err = CreateWav(fallbackSpeech)
+		}
 		defer os.Remove(fileName)
 		if err != nil {
 			return err
