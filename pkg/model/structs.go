@@ -44,6 +44,14 @@ type VoicevoxConfig struct {
 	} `mapstructure:"voicevox"`
 }
 
+type VoicevoxApiConfig struct {
+	Voicevox struct {
+		BaseURL string     `mapstructure:"baseURL"`
+		ApiKey  string     `mapstructure:"apiKey"`
+		Voice   []VoiceVox `mapstructure:"voice"`
+	} `mapstructure:"voicevox_api"`
+}
+
 type VoiceVox struct {
 	Name string
 	Id   int

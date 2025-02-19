@@ -43,6 +43,7 @@ func Voices() map[string]string {
 	voices = merge(voices, VoiceRoidList())
 	voices = merge(voices, LocalVoiceList())
 	voices = merge(voices, VoicevoxList())
+	voices = merge(voices, VoicevoxApiList())
 	voices = merge(voices, AquestalkList())
 	return voices
 }
@@ -70,6 +71,13 @@ func VoicevoxList() map[string]string {
 	}
 	return list
 }
+func VoicevoxApiList() map[string]string {
+	list := map[string]string{}
+	for _, v := range config.Va.Voicevox.Voice {
+		list[v.Name] = v.Name
+	}
+	return list
+}
 
 func IsVoiceRoid(name string) bool {
 	for _, v := range config.Vo.Voiceroid.Voice {
@@ -82,6 +90,15 @@ func IsVoiceRoid(name string) bool {
 
 func IsVoiceVox(name string) bool {
 	for _, v := range config.Vv.Voicevox.Voice {
+		if v.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
+func IsVoiceVoxApi(name string) bool {
+	for _, v := range config.Va.Voicevox.Voice {
 		if v.Name == name {
 			return true
 		}

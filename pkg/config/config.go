@@ -13,6 +13,7 @@ var O = &model.Options{}
 var Vo = &model.VoiceRoidConfig{}
 var Vv = &model.VoicevoxConfig{}
 var Aq = &model.AquestalkConfig{}
+var Va = &model.VoicevoxApiConfig{}
 
 // Watch hot reload
 func Watch() {
@@ -28,6 +29,7 @@ func Reload(e fsnotify.Event) {
 	LoadVoiceConfig(e.Name)
 	LoadVoiceVoxConfig(e.Name)
 	LoadAquestalkConfig(e.Name)
+	LoadVoiceVoxApiConfig(e.Name)
 	//StopStream()
 }
 
@@ -83,6 +85,22 @@ func LoadVoiceVoxConfig(filename string) (err error) {
 		return err
 	}
 	err = viper.Unmarshal(&Vv)
+	if err != nil {
+		return errors.New("cannot load config")
+	}
+	return nil
+}
+
+func LoadVoiceVoxApiConfig(filename string) (err error) {
+	Va = &model.VoicevoxApiConfig{}
+	viper.SetConfigType("toml")
+	viper.SetConfigFile(filename)
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		return err
+	}
+	err = viper.Unmarshal(&Va)
 	if err != nil {
 		return errors.New("cannot load config")
 	}

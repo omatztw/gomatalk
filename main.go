@@ -73,6 +73,12 @@ func main() {
 		return
 	}
 
+	err = config.LoadVoiceVoxApiConfig(*filename)
+	if err != nil {
+		log.Println("FATA:", err)
+		return
+	}
+
 	err = config.LoadAquestalkConfig(*filename)
 	if err != nil {
 		log.Println("FATA:", err)
