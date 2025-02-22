@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"time"
 
 	"github.com/omatztw/gomatalk/pkg/config"
@@ -58,5 +59,19 @@ func CreateVoiceVoxApiWav(speech Speech) (string, error) {
 	defer file.Close()
 	io.Copy(file, response.Body)
 
-	return wavFileName, nil
+	I := -28 + speech.UserInfo.Volume
+
+	// 音量調整が必要な場合、ffmpegで処理
+	adjustedFileName := fmt.Sprintf("/tmp/voice-adjusted-%d.wav", time.Now().UnixNano())
+	cmd := exec.Command("ffmpeg", "-i", wavFileName, "-af",
+		fmt.Sprintf("loudnorm=I=%f:TP=-1.5:LRA=11", I),
+		"-y", adjustedFileName)
+
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("音量正規化に失敗しました: %v", err)
+	}
+
+	// 元のファイルを削除
+	os.Remove(wavFileName)
+	return adjustedFileName, nil
 }
