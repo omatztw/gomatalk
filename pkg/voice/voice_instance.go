@@ -1,7 +1,8 @@
 package voice
 
 import (
-	"os"
+	"log"
+	// "os"
 	"sync"
 	"time"
 
@@ -84,6 +85,7 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 		} else {
 			fileName, err = CreateWav(speech)
 		}
+		log.Println(fileName)
 		if err != nil {
 			// VOICEROIDやVOICEBOXが起動していない場合に通常音声で再生する
 			fallbackSpeech := Speech{
@@ -101,7 +103,7 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 			}
 			fileName, err = CreateWav(fallbackSpeech)
 		}
-		defer os.Remove(fileName)
+		// defer os.Remove(fileName)
 		if err != nil {
 			return err
 		}

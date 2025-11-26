@@ -1,4 +1,4 @@
-FROM golang:1.17.7-buster as builder
+FROM golang:1.25.4-bookworm as builder
 
 RUN mkdir -p /workspace
 WORKDIR /workspace
@@ -10,7 +10,7 @@ RUN apt install -y libopus-dev
 
 RUN go build
 
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 
 RUN apt-get update 
 RUN apt-get install -y build-essential unzip ffmpeg wget open-jtalk open-jtalk-mecab-naist-jdic

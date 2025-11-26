@@ -4,13 +4,10 @@ go 1.12
 
 require (
 	github.com/boltdb/bolt v1.3.1
-	github.com/bwmarrin/discordgo v0.27.1
+	github.com/bwmarrin/discordgo v0.28.1
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/golang-migrate/migrate/v4 v4.15.2
-	github.com/google/go-github/v35 v35.2.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
-	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/mattn/go-sqlite3 v1.14.16 // indirect
 	github.com/omatztw/dgvoice v0.0.0-20220223044428-1f960e96950b
 	github.com/pelletier/go-toml v1.9.5 // indirect
@@ -23,3 +20,5 @@ require (
 	gorm.io/gorm v1.24.6
 	layeh.com/gopus v0.0.0-20210501142526-1ee02d434e32 // indirect
 )
+
+replace github.com/bwmarrin/discordgo v0.28.1 => github.com/omatztw/discordgo v0.0.0-20251126152932-a505ba4d1fd4

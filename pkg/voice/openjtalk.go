@@ -169,6 +169,7 @@ func CreateWav(speech Speech) (string, error) {
 	cmd = append(cmd, textFileName)
 
 	run := exec.Command("open_jtalk", cmd...)
+	log.Println(cmd)
 
 	err := run.Run()
 	if err != nil {
