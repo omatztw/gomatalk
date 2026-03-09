@@ -1,4 +1,4 @@
-FROM golang:1.25.4-bookworm as builder
+FROM golang:1.25.4 as builder
 
 RUN mkdir -p /workspace
 WORKDIR /workspace
@@ -6,11 +6,22 @@ WORKDIR /workspace
 COPY .  /workspace/.
 
 RUN apt update 
-RUN apt install -y libopus-dev
+RUN apt install -y libopus-dev wget unzip pkg-config
+
+RUN \
+ wget -O /tmp/libdave.zip https://github.com/discord/libdave/releases/download/v1.1.1/cpp/libdave-Linux-X64-boringssl.zip && \
+ unzip /tmp/libdave.zip -d /tmp/libdave && \
+ cp /tmp/libdave/lib/libdave.so /usr/local/lib/libdave.so && \
+ cp /tmp/libdave/include/dave/dave.h /usr/local/include/dave.h && \
+ mkdir -p /usr/local/lib/pkgconfig && \
+ printf "prefix=/usr/local\nlibdir=\${prefix}/lib\nincludedir=\${prefix}/include\n\nName: dave\nDescription: Discord Audio/Video Encryption library\nVersion: 1.1.1\nLibs: -L\${libdir} -ldave\nCflags: -I\${includedir}\n" > /usr/local/lib/pkgconfig/dave.pc && \
+ rm -rf /tmp/libdave /tmp/libdave.zip
+
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
 RUN go build
 
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 RUN apt-get update 
 RUN apt-get install -y build-essential unzip ffmpeg wget open-jtalk open-jtalk-mecab-naist-jdic
@@ -40,6 +51,8 @@ RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 
 COPY --from=builder /workspace/gomatalk .
+COPY --from=builder /usr/local/lib/libdave.so /usr/local/lib/libdave.so
+ENV LD_LIBRARY_PATH=/usr/local/lib
 RUN mkdir data
 VOLUME /workspace/data
 RUN mkdir wav
