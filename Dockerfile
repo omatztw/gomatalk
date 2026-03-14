@@ -1,15 +1,22 @@
 FROM golang:1.25.4 as builder
 
+ARG TARGETARCH
+
 RUN mkdir -p /workspace
 WORKDIR /workspace
 
 COPY .  /workspace/.
 
-RUN apt update 
+RUN apt update
 RUN apt install -y libopus-dev wget unzip pkg-config
 
 RUN \
- wget -O /tmp/libdave.zip https://github.com/discord/libdave/releases/download/v1.1.1/cpp/libdave-Linux-X64-boringssl.zip && \
+ case "$TARGETARCH" in \
+   amd64) DAVE_ARCH="X64" ;; \
+   arm64) DAVE_ARCH="ARM64" ;; \
+   *) echo "Unsupported architecture: $TARGETARCH" && exit 1 ;; \
+ esac && \
+ wget -O /tmp/libdave.zip "https://github.com/discord/libdave/releases/download/v1.1.1/cpp/libdave-Linux-${DAVE_ARCH}-boringssl.zip" && \
  unzip /tmp/libdave.zip -d /tmp/libdave && \
  cp /tmp/libdave/lib/libdave.so /usr/local/lib/libdave.so && \
  cp /tmp/libdave/include/dave/dave.h /usr/local/include/dave.h && \
