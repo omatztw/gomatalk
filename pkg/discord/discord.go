@@ -92,7 +92,10 @@ func UserCountVoiceChannel(voiceChannel string) int {
 
 // SearchGuild search the guild ID
 func SearchGuild(textChannelID string) (guildID string) {
-	channel, _ := Dg.Channel(textChannelID)
+	channel, err := Dg.Channel(textChannelID)
+	if err != nil || channel == nil {
+		return ""
+	}
 	guildID = channel.GuildID
 	return
 }
@@ -206,6 +209,9 @@ func VoiceServerUpdateHandler(s *discordgo.Session, update *discordgo.VoiceServe
 // MessageCreateHandler
 func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	guildID := SearchGuild(m.ChannelID)
+	if guildID == "" {
+		return
+	}
 	botList, _ := global.DB.ListBots(guildID)
 	isSpecial := false
 	if m.Author.Bot {
