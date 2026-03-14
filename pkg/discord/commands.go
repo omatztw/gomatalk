@@ -1,6 +1,7 @@
 package discord
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/snowflake/v2"
 	"github.com/omatztw/gomatalk/pkg/config"
 	"github.com/omatztw/gomatalk/pkg/db"
 	global "github.com/omatztw/gomatalk/pkg/global_vars"
@@ -77,18 +79,33 @@ func JoinReporter(v *voice.VoiceInstance, m *discordgo.MessageCreate, s *discord
 		global.Mutex.Unlock()
 		//v.InitVoice()
 	}
-	var err error
 	v.ChannelID = m.ChannelID
-	v.Voice, err = Dg.ChannelVoiceJoin(v.GuildID, voiceChannelID, false, false)
+	v.VoiceChannelID = voiceChannelID
+	if global.VoiceManager == nil {
+		log.Println("ERROR: Voice manager is not initialized")
+		ChMessageSend(m.ChannelID, "音声接続の初期化に失敗しています。")
+		return
+	}
+	guildSF, err := snowflake.Parse(v.GuildID)
+	if err != nil {
+		log.Println("ERROR: Invalid guild ID:", err)
+		return
+	}
+	channelSF, err := snowflake.Parse(voiceChannelID)
+	if err != nil {
+		log.Println("ERROR: Invalid voice channel ID:", err)
+		return
+	}
+	conn := global.VoiceManager.CreateConn(guildSF)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	err = conn.Open(ctx, channelSF, false, false)
 	if err != nil {
 		v.StopTalking()
 		log.Println("ERROR: Error to join in a voice channel: ", err)
 		return
 	}
-	if config.O.Discord.Debug {
-		v.Voice.LogLevel = discordgo.LogDebug
-	}
-	// v.Voice.Speaking(false)
+	v.Conn = conn
 
 	botUser, _ := Dg.User("@me")
 	channel, err := Dg.Channel(m.ChannelID)
@@ -118,7 +135,10 @@ func LeaveReporter(v *voice.VoiceInstance, m *discordgo.MessageCreate) {
 
 func closeConnection(v *voice.VoiceInstance) {
 	time.Sleep(200 * time.Millisecond)
-	v.Voice.Disconnect()
+	if v.Conn != nil {
+		v.Conn.Close(context.Background())
+	}
+	v.Conn = nil
 	log.Println("INFO: Voice channel destroyed")
 	global.Mutex.Lock()
 	delete(global.VoiceInstances, v.GuildID)
@@ -457,7 +477,7 @@ func StopReporter(v *voice.VoiceInstance, m *discordgo.MessageCreate) {
 		return
 	}
 	voiceChannelID := SearchVoiceChannel(m.Author.ID)
-	if v.Voice.ChannelID != voiceChannelID {
+	if v.VoiceChannelID != voiceChannelID {
 		return
 	}
 	v.StopTalking()

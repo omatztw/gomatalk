@@ -1,7 +1,9 @@
-version: "3.9" 
 services:
   gomatalk:
-    image: omatztw/gomatalk
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gomatalk:local
     restart: always
     environment:
       TZ: Asia/Tokyo

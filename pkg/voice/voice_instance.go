@@ -1,28 +1,37 @@
 package voice
 
 import (
+	"bufio"
+	"context"
+	"encoding/binary"
+	"errors"
+	"io"
 	"os"
+	"os/exec"
+	"strconv"
 	"sync"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/omatztw/dgvoice"
+	disgovoice "github.com/disgoorg/disgo/voice"
 	"github.com/omatztw/gomatalk/pkg/model"
+	"layeh.com/gopus"
 )
 
 type VoiceInstance struct {
 	sync.Mutex
-	Voice      *discordgo.VoiceConnection
-	Session    *discordgo.Session
-	QueueMutex sync.Mutex
-	VoiceMutex sync.Mutex
-	NowTalking Speech
-	Queue      []Speech
-	Recv       []int16
-	GuildID    string
-	ChannelID  string
-	Speaking   bool
-	Stop       chan bool
+	Conn           disgovoice.Conn
+	Session        *discordgo.Session
+	QueueMutex     sync.Mutex
+	VoiceMutex     sync.Mutex
+	NowTalking     Speech
+	Queue          []Speech
+	Recv           []int16
+	GuildID        string
+	ChannelID      string
+	VoiceChannelID string
+	Speaking       bool
+	Stop           chan bool
 }
 
 type SpeechSignal struct {
@@ -106,23 +115,26 @@ func (v *VoiceInstance) Talk(speech Speech) error {
 			return err
 		}
 	}
-	c1 := make(chan string, 1)
+	c1 := make(chan error, 1)
 	go func() {
-		dgvoice.PlayAudioFile(v.Voice, fileName, v.Stop)
-		close(c1)
+		c1 <- playAudioFile(v.Conn, fileName, v.Stop)
 	}()
 	select {
-	case <-c1:
-		return nil
+	case err := <-c1:
+		return err
 	case <-time.After(30 * time.Second):
 		v.StopTalking()
+		<-c1
 		return nil
 	}
 }
 
 func (v *VoiceInstance) StopTalking() {
 	if v.Speaking {
-		v.Stop <- true
+		select {
+		case v.Stop <- true:
+		default:
+		}
 	}
 }
 
@@ -156,5 +168,85 @@ func (v *VoiceInstance) QueueRemoveFisrt() {
 	defer v.QueueMutex.Unlock()
 	if len(v.Queue) != 0 {
 		v.Queue = v.Queue[1:]
+	}
+}
+
+const (
+	audioChannels  int = 2
+	audioFrameRate int = 48000
+	audioFrameSize int = 960
+	audioMaxBytes  int = (audioFrameSize * 2) * 2
+)
+
+func playAudioFile(conn disgovoice.Conn, filename string, stop <-chan bool) error {
+	if conn == nil {
+		return errors.New("voice connection is nil")
+	}
+
+	drainStop(stop)
+
+	cmd := exec.Command("ffmpeg", "-i", filename, "-f", "s16le", "-ar", strconv.Itoa(audioFrameRate), "-ac", strconv.Itoa(audioChannels), "pipe:1")
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	reader := bufio.NewReaderSize(stdout, 16384)
+
+	if err = cmd.Start(); err != nil {
+		return err
+	}
+	defer cmd.Process.Kill()
+
+	encoder, err := gopus.NewEncoder(audioFrameRate, audioChannels, gopus.Audio)
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	_ = conn.SetSpeaking(ctx, disgovoice.SpeakingFlagMicrophone)
+	cancel()
+	defer func() {
+		for i := 0; i < 5; i++ {
+			_, _ = conn.UDP().Write(disgovoice.SilenceAudioFrame)
+		}
+		stopCtx, stopCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		_ = conn.SetSpeaking(stopCtx, disgovoice.SpeakingFlagNone)
+		stopCancel()
+	}()
+
+	for {
+		select {
+		case <-stop:
+			return nil
+		default:
+		}
+
+		pcm := make([]int16, audioFrameSize*audioChannels)
+		err = binary.Read(reader, binary.LittleEndian, &pcm)
+		if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		frame, err := encoder.Encode(pcm, audioFrameSize, audioMaxBytes)
+		if err != nil {
+			return err
+		}
+		if _, err = conn.UDP().Write(frame); err != nil {
+			return err
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+}
+
+func drainStop(stop <-chan bool) {
+	for {
+		select {
+		case <-stop:
+		default:
+			return
+		}
 	}
 }

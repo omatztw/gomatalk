@@ -1,11 +1,17 @@
 package discord
 
 import (
+	"context"
 	"log"
 	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	disgodiscord "github.com/disgoorg/disgo/discord"
+	disgogateway "github.com/disgoorg/disgo/gateway"
+	disgovoice "github.com/disgoorg/disgo/voice"
+	"github.com/disgoorg/godave/golibdave"
+	"github.com/disgoorg/snowflake/v2"
 	"github.com/omatztw/gomatalk/pkg/config"
 	global "github.com/omatztw/gomatalk/pkg/global_vars"
 	"github.com/omatztw/gomatalk/pkg/play"
@@ -28,6 +34,7 @@ func DiscordConnect() (err error) {
 	Dg.AddHandler(GuildCreateHandler)
 	// dg.AddHandler(GuildDeleteHandler)
 	Dg.AddHandler(VoiceStatusUpdateHandler)
+	Dg.AddHandler(VoiceServerUpdateHandler)
 	Dg.AddHandler(ConnectHandler)
 	if config.O.Discord.NumShard > 1 {
 		Dg.ShardCount = config.O.Discord.NumShard
@@ -50,6 +57,7 @@ func DiscordConnect() (err error) {
 		return
 	} // Login successful
 	log.Println("INFO: Bot is now running. Press CTRL-C to exit.")
+	initVoiceManager()
 	initRoutine()
 	Dg.UpdateGameStatus(0, config.O.Discord.Status)
 	return nil
@@ -146,23 +154,22 @@ func GuildCreateHandler(s *discordgo.Session, guild *discordgo.GuildCreate) {
 }
 
 func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateUpdate) {
+	if global.VoiceManager != nil {
+		global.VoiceManager.HandleVoiceStateUpdate(toDisgoVoiceStateUpdate(voice))
+	}
+
 	v := global.VoiceInstances[voice.GuildID]
 	if v == nil {
 		return
 	}
-	if v.Voice == nil {
+	if v.Conn == nil {
 		return
 	}
 	user, _ := Dg.User(voice.UserID)
 	botUser, _ := Dg.User("@me")
 
 	if voice.UserID == botUser.ID {
-		if voice == nil || voice.BeforeUpdate == nil || voice.ChannelID == "" {
-			return
-		}
-		if voice.BeforeUpdate.ChannelID != voice.ChannelID {
-			v.Voice, _ = Dg.ChannelVoiceJoin(v.GuildID, voice.ChannelID, false, false)
-		}
+		v.VoiceChannelID = voice.ChannelID
 	}
 
 	if user.Bot && voice.UserID != botUser.ID {
@@ -170,24 +177,30 @@ func VoiceStatusUpdateHandler(s *discordgo.Session, voice *discordgo.VoiceStateU
 		return
 	}
 
-	userCount := UserCountVoiceChannel(v.Voice.ChannelID)
+	userCount := UserCountVoiceChannel(v.VoiceChannelID)
 	if userCount == 0 {
 		v.Lock()
 		defer v.Unlock()
-		if v.Voice == nil {
+		if v.Conn == nil {
 			log.Println("INFO: Voice channel has already been destroyed")
 			return
 		}
-		if v.Session.VoiceConnections[v.GuildID] != nil {
-			v.Voice.Disconnect()
-			log.Println("INFO: Voice channel destroyed")
-			global.Mutex.Lock()
-			delete(global.VoiceInstances, v.GuildID)
-			global.Mutex.Unlock()
-			updateNickName(v, "")
-			ChMessageSend(v.ChannelID, config.O.Greeting["nobody"])
-		}
+		v.Conn.Close(context.Background())
+		v.Conn = nil
+		log.Println("INFO: Voice channel destroyed")
+		global.Mutex.Lock()
+		delete(global.VoiceInstances, v.GuildID)
+		global.Mutex.Unlock()
+		updateNickName(v, "")
+		ChMessageSend(v.ChannelID, config.O.Greeting["nobody"])
 	}
+}
+
+func VoiceServerUpdateHandler(s *discordgo.Session, update *discordgo.VoiceServerUpdate) {
+	if global.VoiceManager == nil {
+		return
+	}
+	global.VoiceManager.HandleVoiceServerUpdate(toDisgoVoiceServerUpdate(update))
 }
 
 // MessageCreateHandler
@@ -248,10 +261,73 @@ func MessageCreateHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 		return
 	}
-	if v != nil && v.Voice != nil {
+	if v != nil && v.Conn != nil {
 		if !isSpecial && v.ChannelID != m.ChannelID {
 			return
 		}
 		SpeechText(v, m)
+	}
+}
+
+func initVoiceManager() {
+	if Dg == nil || Dg.State == nil || Dg.State.User == nil {
+		return
+	}
+
+	userID, err := snowflake.Parse(Dg.State.User.ID)
+	if err != nil {
+		log.Println("ERROR: Invalid bot user ID:", err)
+		return
+	}
+
+	global.VoiceManager = disgovoice.NewManager(
+		func(ctx context.Context, guildID snowflake.ID, channelID *snowflake.ID, selfMute bool, selfDeaf bool) error {
+			targetChannel := ""
+			if channelID != nil {
+				targetChannel = channelID.String()
+			}
+			return Dg.ChannelVoiceJoinManual(guildID.String(), targetChannel, selfMute, selfDeaf)
+		},
+		userID,
+		disgovoice.WithDaveSessionCreateFunc(golibdave.NewSession),
+	)
+}
+
+func toDisgoVoiceStateUpdate(update *discordgo.VoiceStateUpdate) disgogateway.EventVoiceStateUpdate {
+	var channelID *snowflake.ID
+	if update.ChannelID != "" {
+		if parsed, err := snowflake.Parse(update.ChannelID); err == nil {
+			channelID = &parsed
+		}
+	}
+
+	guildID, _ := snowflake.Parse(update.GuildID)
+	userID, _ := snowflake.Parse(update.UserID)
+
+	return disgogateway.EventVoiceStateUpdate{
+		VoiceState: disgodiscord.VoiceState{
+			GuildID:                 guildID,
+			ChannelID:               channelID,
+			UserID:                  userID,
+			SessionID:               update.SessionID,
+			GuildDeaf:               update.Deaf,
+			GuildMute:               update.Mute,
+			SelfDeaf:                update.SelfDeaf,
+			SelfMute:                update.SelfMute,
+			SelfStream:              update.SelfStream,
+			SelfVideo:               update.SelfVideo,
+			Suppress:                update.Suppress,
+			RequestToSpeakTimestamp: update.RequestToSpeakTimestamp,
+		},
+	}
+}
+
+func toDisgoVoiceServerUpdate(update *discordgo.VoiceServerUpdate) disgogateway.EventVoiceServerUpdate {
+	guildID, _ := snowflake.Parse(update.GuildID)
+	endpoint := update.Endpoint
+	return disgogateway.EventVoiceServerUpdate{
+		Token:    update.Token,
+		GuildID:  guildID,
+		Endpoint: &endpoint,
 	}
 }
